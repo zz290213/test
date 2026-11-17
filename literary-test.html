@@ -6,187 +6,85 @@
 <title>测测你是哪本名著里的谁</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-  :root {
-    --bg-color: #141210;
-    --card-bg: #1e1b18;
-    --primary: #d4af37; /* 香槟金 */
-    --primary-light: #f3e5ab;
-    --text-main: #f0e6d2;
-    --text-sub: #9a8c76;
-    --border: #3d3226;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body {
-    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: var(--bg-color); color: var(--text-main); min-height: 100vh;
-    display: flex; justify-content: center; align-items: center; padding: 16px;
-  }
-  .app {
-    width: 100%; max-width: 440px; background: var(--card-bg);
-    border: 1px solid var(--border); border-radius: 24px;
-    padding: 36px 24px; min-height: 580px;
-    display: flex; flex-direction: column; justify-content: center;
-    position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-  }
-  .app::before {
-    content:""; position:absolute; top:-80px; right:-80px;
-    width:220px; height:220px;
-    background: radial-gradient(circle, rgba(212,175,55,0.15), transparent 70%);
-    border-radius:50%; z-index: 0;
-  }
+  :root { --bg:#141210; --card:#1e1b18; --pri:#d4af37; --pri-l:#f3e5ab; --txt:#f0e6d2; --sub:#9a8c76; --bor:#3d3226; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, "PingFang SC", sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px; }
+  .app { width: 100%; max-width: 440px; background: var(--card); border: 1px solid var(--bor); border-radius: 24px; padding: 36px 24px; min-height: 580px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
   .hidden { display:none !important; }
-  
-  /* 首页 */
   .cover { text-align:center; position:relative; z-index:1; }
-  .cover .eyebrow { font-size:12px; letter-spacing:5px; color:var(--primary); margin-bottom:20px; font-weight: 600; }
-  .cover h1 { font-size:30px; line-height:1.4; color:var(--text-main); font-weight:700; margin-bottom:16px; letter-spacing: 1px; }
-  .cover .sub { font-size:14px; color:var(--text-sub); line-height:1.8; margin-bottom:40px; }
-  .btn {
-    display:inline-block; width:100%; padding:16px; border:none; border-radius:14px;
-    background: linear-gradient(135deg, var(--primary), #b38e28);
-    color:#141210; font-size:17px; font-weight:800; letter-spacing:1px;
-    cursor:pointer; transition:transform .2s, box-shadow .2s;
-    box-shadow: 0 4px 15px rgba(212,175,55,0.3);
-  }
-  .btn:active { transform:scale(.97); box-shadow: 0 2px 8px rgba(212,175,55,0.3); }
-
-  /* 答题区 */
-  .quiz { position:relative; z-index:1; animation: fadeIn 0.4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  
-  .progress-wrap { margin-bottom:30px; }
-  .progress-text { font-size:12px; color:var(--primary); margin-bottom:10px; text-align:right; font-weight:600; letter-spacing: 1px;}
-  .progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
-  .progress-fill { height:100%; width:6.6%; background:linear-gradient(90deg,var(--primary),var(--primary-light)); border-radius:3px; transition:width .3s ease; }
-  
-  .q-title { font-size:19px; line-height:1.6; color:var(--text-main); margin-bottom:24px; font-weight:600; }
+  .cover h1 { font-size:30px; line-height:1.4; color:var(--txt); margin-bottom:16px; }
+  .cover .sub { font-size:14px; color:var(--sub); line-height:1.8; margin-bottom:40px; }
+  .btn { display:block; width:100%; padding:16px; border:none; border-radius:14px; background: linear-gradient(135deg, var(--pri), #b38e28); color:#141210; font-size:17px; font-weight:800; cursor:pointer; }
+  .quiz { position:relative; z-index:1; }
+  .progress-text { font-size:12px; color:var(--pri); margin-bottom:10px; text-align:right; font-weight:600; }
+  .progress-bar { height:6px; background:var(--bor); border-radius:3px; overflow:hidden; margin-bottom:30px;}
+  .progress-fill { height:100%; width:6.6%; background:var(--pri); transition:width .3s; }
+  .q-title { font-size:19px; line-height:1.6; color:var(--txt); margin-bottom:24px; }
   .options { display:flex; flex-direction:column; gap:12px; }
-  .option {
-    padding:16px 18px; border:1.5px solid var(--border); border-radius:14px;
-    font-size:14px; line-height:1.5; color:#c4b7a3; cursor:pointer;
-    background:rgba(255,255,255,0.02); transition:all .2s;
-  }
-  .option:active, .option.selected {
-    border-color:var(--primary); background:rgba(212,175,55,0.1); color:var(--primary-light);
-    transform: scale(0.98);
-  }
-
-  /* 结果区 */
-  .result { text-align:center; position:relative; z-index:1; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-  .result .tag { font-size:12px; letter-spacing:4px; color:var(--primary); margin-bottom:20px; font-weight:600; }
-  .result .avatar {
-    width:100px; height:100px; border-radius:50%; margin:0 auto 20px;
-    background:linear-gradient(135deg,#2a241d,#141210);
-    border:2px solid var(--primary); display:flex; align-items:center; justify-content:center;
-    font-size:36px; font-weight:700; color:var(--primary-light);
-    box-shadow: 0 0 20px rgba(212,175,55,0.2);
-  }
-  .result h2 { font-size:28px; color:var(--primary-light); margin-bottom:8px; font-weight: 700; }
-  .result .label { font-size:14px; color:var(--primary); margin-bottom:24px; letter-spacing:1px; font-weight: 600;}
-  
-  .result-card {
-    background:rgba(255,255,255,0.03); border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 20px;
-  }
-  .result-card h3 { font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: 600; }
+  .option { padding:16px 18px; border:1.5px solid var(--bor); border-radius:14px; font-size:14px; color:#c4b7a3; cursor:pointer; background:rgba(255,255,255,0.02); }
+  .option:active, .option.selected { border-color:var(--pri); background:rgba(212,175,55,0.1); color:var(--pri-l); }
+  .result { text-align:center; position:relative; z-index:1; }
+  .result .avatar { width:100px; height:100px; border-radius:50%; margin:0 auto 20px; background:var(--bg); border:2px solid var(--pri); display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:700; color:var(--pri-l); }
+  .result h2 { font-size:28px; color:var(--pri-l); margin-bottom:8px; }
+  .result .label { font-size:14px; color:var(--pri); margin-bottom:24px; }
+  .result-card { background:rgba(255,255,255,0.03); border: 1px solid var(--bor); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 20px; }
+  .result-card h3 { font-size: 14px; color: var(--pri); margin-bottom: 8px; }
   .result-card p { font-size: 14px; line-height: 1.8; color: #b8ac98; margin-bottom: 16px; }
   .result-card p:last-child { margin-bottom: 0; }
-  
-  .quote {
-    font-size: 13px; font-style: italic; color: var(--primary-light);
-    border-left: 3px solid var(--primary); padding-left: 12px; margin: 20px 0;
-    line-height: 1.6; text-align: left;
-  }
-
-  .result .disclaimer { font-size:11px; color:#6b6050; line-height:1.6; margin-bottom:24px; text-align: center;}
-  
-  .action-btns { display: flex; gap: 12px; margin-top: 10px; }
-  .btn-save {
-    flex: 1; background: linear-gradient(135deg, var(--primary), #b38e28); border: none; color: #141210;
-    font-size:15px; padding:15px; border-radius:14px; cursor:pointer; font-weight:700;
-    transition: all 0.2s; box-shadow: 0 4px 15px rgba(212,175,55,0.3);
-  }
-  .btn-save:active { transform: scale(0.97); }
-  .btn-again {
-    flex: 1; background:transparent; border:1.5px solid var(--border); color:var(--text-sub);
-    font-size:15px; padding:15px; border-radius:14px; cursor:pointer;
-    transition: all 0.2s; font-weight: 600;
-  }
-  .btn-again:active { background: rgba(255,255,255,0.05); color: var(--text-main); }
-
+  .quote { font-size: 13px; font-style: italic; color: var(--pri-l); border-left: 3px solid var(--pri); padding-left: 12px; margin: 20px 0; text-align: left; }
+  .disclaimer { font-size:11px; color:#6b6050; margin-bottom:24px; }
+  .action-btns { display: flex; gap: 12px; }
+  .btn-save { flex: 1; background: var(--pri); border: none; color: var(--bg); font-size:15px; padding:15px; border-radius:14px; font-weight:700; cursor:pointer;}
+  .btn-again { flex: 1; background:transparent; border:1.5px solid var(--bor); color:var(--sub); font-size:15px; padding:15px; border-radius:14px; cursor:pointer;}
   #poster-container { position: absolute; top: -9999px; left: -9999px; }
 </style>
 </head>
 <body>
 <div class="app">
-
-  <!-- 首页 -->
   <div id="cover" class="cover">
-    <div class="eyebrow">L I T E R A R Y · T E S T</div>
+    <div style="font-size:12px; letter-spacing:5px; color:var(--pri); margin-bottom:20px;">L I T E R A R Y</div>
     <h1>测测你是<br>哪本名著里的谁</h1>
     <p class="sub">15 道直击灵魂的选择题<br>20 种文学巨匠原型，看看你骨子里住着谁</p>
     <button class="btn" onclick="startQuiz()">开启灵魂测试</button>
   </div>
 
-  <!-- 答题 -->
   <div id="quiz" class="quiz hidden">
-    <div class="progress-wrap">
-      <div class="progress-text" id="progressText">1 / 15</div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
+    <div class="progress-text" id="progressText">1 / 15</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     <div class="q-title" id="qTitle"></div>
     <div class="options" id="options"></div>
   </div>
 
-  <!-- 结果 -->
   <div id="result" class="result hidden">
-    <div class="tag">YOUR ARCHETYPE</div>
     <div class="avatar" id="rAvatar"></div>
     <h2 id="rName"></h2>
     <div class="label" id="rLabel"></div>
-    
     <div class="result-card">
-      <h3>灵魂画像</h3>
-      <p id="rDesc"></p>
-      <h3>你的高光</h3>
-      <p id="rStrength"></p>
-      <h3>潜在盲区</h3>
-      <p id="rWeakness"></p>
+      <h3>灵魂画像</h3><p id="rDesc"></p>
+      <h3>你的高光</h3><p id="rStrength"></p>
+      <h3>潜在盲区</h3><p id="rWeakness"></p>
     </div>
-    
     <div class="quote" id="rQuote"></div>
-    
     <p class="disclaimer">* 本测试基于文学原型理论生成，仅供娱乐。</p>
-    
     <div class="action-btns">
       <button class="btn-save" id="saveBtn" onclick="generatePoster()">生成图片</button>
       <button class="btn-again" onclick="restart()">再测一次</button>
     </div>
   </div>
-
 </div>
 
-<!-- 隐藏的海报模板 -->
 <div id="poster-container">
-  <div id="poster" style="width: 375px; padding: 40px 30px; background: linear-gradient(160deg, #1e1b18, #141210); border-radius: 20px; box-sizing: border-box; position: relative;">
-    <div style="text-align: center; color: #d4af37; font-size: 12px; letter-spacing: 3px; margin-bottom: 20px; font-weight: bold;">LITERARY TEST</div>
+  <div id="poster" style="width: 375px; padding: 40px 30px; background: #1e1b18; border-radius: 20px;">
+    <div style="text-align: center; color: #d4af37; font-size: 12px; letter-spacing: 3px; margin-bottom: 20px;">LITERARY TEST</div>
     <div id="p-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #2a241d; border: 2px solid #d4af37; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: #f3e5ab; font-size: 28px; font-weight: bold;"></div>
     <div id="p-name" style="text-align: center; color: #f3e5ab; font-size: 24px; font-weight: bold; margin-bottom: 5px;"></div>
     <div id="p-label" style="text-align: center; color: #d4af37; font-size: 13px; margin-bottom: 25px;"></div>
-    <div id="p-quote" style="font-size: 14px; color: #f0e6d2; font-style: italic; text-align: center; line-height: 1.6; margin-bottom: 25px; padding: 0 10px; border-left: 2px solid #d4af37; border-right: 2px solid #d4af37; padding-top: 8px; padding-bottom: 8px;"></div>
-    <div style="border-top: 1px dashed #3d3226; margin-bottom: 20px;"></div>
-    <div style="text-align: center; font-size: 12px; color: #9a8c76; margin-bottom: 25px;">
-      <p style="margin-bottom: 5px;">长按识别二维码，测测你的隐藏灵魂</p>
-      <div style="width: 60px; height: 60px; background: #333; margin: 0 auto; border-radius: 4px; color: #666; font-size: 10px; line-height: 60px;">二维码</div>
-    </div>
+    <div id="p-quote" style="font-size: 14px; color: #f0e6d2; font-style: italic; text-align: center; line-height: 1.6; margin-bottom: 25px; padding: 8px 10px; border-left: 2px solid #d4af37; border-right: 2px solid #d4af37;"></div>
+    <div style="text-align: center; font-size: 10px; color: #666;">长按识别，测测你的隐藏人格</div>
   </div>
 </div>
 
 <script>
-// 15道精选题目，选项暗中指向不同的特质群
-// 计分逻辑：每个选项会同时给1-3个人物加分，确保20个人物都有机会被选中
 const questions = [
   { q: "朋友深夜找你倾诉糟心事，你的第一反应是？", opts: [ { t: "陪她一起难过，自己也想哭", k: ["林黛玉","贾宝玉"] }, { t: "冷静帮她理清下一步怎么做", k: ["简·爱","福尔摩斯","诸葛亮"] }, { t: "“谁欺负你了？我去算账”", k: ["孙悟空","鲁智深","武松"] }, { t: "安静听完，问最让她难受的点", k: ["唐僧","甘地"] }, { t: "盘算这件事怎么处理最有利", k: ["曹操","王熙凤"] }, { t: "讲离谱故事让她觉得人生本就荒诞", k: ["堂吉诃德","李白"] } ] },
   { q: "走进全是陌生人的聚会，你通常会？", opts: [ { t: "角落坐下，默默观察", k: ["林黛玉","简·爱"] }, { t: "主动找一两个人聊，不合适就撤", k: ["福尔摩斯","郭靖"] }, { t: "加入最热闹的一堆，先玩再说", k: ["孙悟空","王熙凤"] }, { t: "站旁边听，分析关系网", k: ["诸葛亮","曹操"] }, { t: "判断谁最有分量，找机会认识", k: ["于连","曹操"] }, { t: "跟谁都能聊，聊自己痴迷的事", k: ["堂吉诃德","李白"] }] },
@@ -205,7 +103,6 @@ const questions = [
   { q: "你觉得自己身上最矛盾的一点是？", opts: [ { t: "渴望被懂又害怕被看透", k: ["林黛玉","哈姆雷特"] }, { t: "外表随和内心极度挑剔", k: ["简·爱","福尔摩斯"] }, { t: "明明很要强却容易心软", k: ["孙悟空","武松"] }, { t: "想掌控一切又嫌麻烦", k: ["曹操","王熙凤"] }, { t: "理想主义却又渴望世俗成功", k: ["于连","堂吉诃德"] }, { t: "觉得人间无聊又想济世救人", k: ["李白","唐僧","郭靖"] }] }
 ];
 
-// 20个人物的详细数据（为你打造了非常有传播力的文案）
 const results = {
   "林黛玉": { avatar:"黛", label: "敏感细腻型 · 红楼一梦", desc: "你把感受放在第一位，有着极高的情感分辨率。别人眼里的小事，会在你心里泛起很久的涟漪。", strength: "极高的共情力与艺术直觉，你懂人性的幽微，能提供深度的情绪价值。", weakness: "容易陷入精神内耗。有时候，钝感力是你需要学习的课题。", quote: "“我就是个多愁多病身，你就是那倾国倾城貌。”" },
   "贾宝玉": { avatar:"宝", label: "多情温柔型 · 怡红公子", desc: "你对世界充满悲悯，特别是对女性和弱者。你讨厌世俗的功名利禄，只想在温柔乡里守护真情。", strength: "极高的同理心与包容度。你身上有着最纯粹的人性光辉，让人想靠近。", weakness: "缺乏现实的执行力，遇到挫折容易逃避。该扛责任时，需要更勇敢一点。", quote: "“女儿是水作的骨肉，男人是泥作的骨肉。”" },
@@ -229,7 +126,7 @@ const results = {
 };
 
 let current = 0;
-let scores = {}; // 动态初始化
+let scores = {};
 Object.keys(results).forEach(k => scores[k] = 0);
 let isAnimating = false;
 let currentResultKey = "林黛玉";
@@ -247,4 +144,101 @@ function renderQuestion() {
   const q = questions[current];
   document.getElementById("progressText").textContent = (current + 1) + " / " + questions.length;
   document.getElementById("progressFill").style.width = ((current + 1) / questions.length * 100) + "%";
-  document.getElementById("qTitle").
+  document.getElementById("qTitle").textContent = q.q;
+
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+  q.opts.forEach(function(opt) {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.textContent = opt.t;
+    div.onclick = function() { choose(opt.k, div); };
+    box.appendChild(div);
+  });
+}
+
+function choose(keys, el) {
+  if (isAnimating) return;
+  isAnimating = true;
+  el.classList.add("selected");
+  
+  keys.forEach(k => { if(scores[k] !== undefined) scores[k]++; });
+  
+  setTimeout(() => {
+    current++;
+    if (current < questions.length) {
+      renderQuestion();
+      isAnimating = false;
+    } else {
+      showResult();
+      isAnimating = false;
+    }
+  }, 250); 
+}
+
+function showResult() {
+  let best = Object.keys(scores)[0];
+  let max = scores[best];
+  for (const k in scores) {
+    if (scores[k] > max) { max = scores[k]; best = k; }
+  }
+  currentResultKey = best;
+  const r = results[best];
+  
+  document.getElementById("rAvatar").textContent = r.avatar;
+  document.getElementById("rName").textContent = best;
+  document.getElementById("rLabel").textContent = r.label;
+  document.getElementById("rDesc").textContent = r.desc;
+  document.getElementById("rStrength").textContent = r.strength;
+  document.getElementById("rWeakness").textContent = r.weakness;
+  document.getElementById("rQuote").textContent = r.quote;
+
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+}
+
+function generatePoster() {
+  const btn = document.getElementById("saveBtn");
+  btn.textContent = "生成中...";
+  const r = results[currentResultKey];
+  document.getElementById("p-avatar").textContent = r.avatar;
+  document.getElementById("p-name").textContent = currentResultKey;
+  document.getElementById("p-label").textContent = r.label;
+  document.getElementById("p-quote").textContent = r.quote;
+
+  html2canvas(document.getElementById("poster"), { scale: 2, useCORS: true, backgroundColor: "#141210" }).then(canvas => {
+    const imgData = canvas.toDataURL("image/jpeg", 0.9);
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;";
+    
+    const img = document.createElement("img");
+    img.src = imgData;
+    img.style.cssText = "width:80%;max-width:375px;border-radius:12px;";
+    
+    const tip = document.createElement("div");
+    tip.textContent = "长按图片保存到相册";
+    tip.style.cssText = "color:#d4af37;margin-top:20px;font-size:16px;font-weight:bold;";
+    
+    const closeBtn = document.createElement("div");
+    closeBtn.textContent = "✕";
+    closeBtn.style.cssText = "position:absolute;top:20px;right:20px;color:#fff;font-size:30px;";
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+
+    overlay.appendChild(img);
+    overlay.appendChild(tip);
+    overlay.appendChild(closeBtn);
+    document.body.appendChild(overlay);
+    btn.textContent = "生成图片";
+  }).catch(err => {
+    alert("生成失败，请截图保存～");
+    btn.textContent = "生成图片";
+  });
+}
+
+function restart() {
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("cover").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
