@@ -23,6 +23,8 @@
   .options { display:flex; flex-direction:column; gap:12px; }
   .option { padding:16px 18px; border:1.5px solid var(--bor); border-radius:14px; font-size:14px; color:#c4b7a3; cursor:pointer; background:rgba(255,255,255,0.02); transition:all .2s;}
   .option:active, .option.selected { border-color:var(--pri); background:rgba(212,175,55,0.1); color:var(--pri-l); transform: scale(0.98);}
+  
+  /* 网页结果页样式 */
   .result { text-align:center; position:relative; z-index:1; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
   .result .avatar { width:100px; height:100px; border-radius:50%; margin:0 auto 20px; background:var(--bg); border:2px solid var(--pri); display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:700; color:var(--pri-l); }
@@ -38,7 +40,7 @@
   .btn-save { flex: 1; background: var(--pri); border: none; color: var(--bg); font-size:15px; padding:15px; border-radius:14px; font-weight:700; cursor:pointer;}
   .btn-again { flex: 1; background:transparent; border:1.5px solid var(--bor); color:var(--sub); font-size:15px; padding:15px; border-radius:14px; cursor:pointer;}
   
-  /* 隐藏海报区 */
+  /* 隐藏海报区 - 重新排版，包含全部内容 */
   #poster-container { position: absolute; top: -9999px; left: -9999px; z-index: -1; }
 </style>
 </head>
@@ -70,24 +72,45 @@
     <div class="quote" id="rQuote"></div>
     <p class="disclaimer">* 本测试基于文学原型理论生成，仅供娱乐。</p>
     <div class="action-btns">
-      <button class="btn-save" id="saveBtn" onclick="generatePoster()">生成图片</button>
+      <button class="btn-save" id="saveBtn" onclick="generatePoster()">生成完整报告图片</button>
       <button class="btn-again" onclick="restart()">再测一次</button>
     </div>
   </div>
 </div>
 
-<!-- 生成海报的模板 -->
+<!-- 隐藏海报区（包含所有长文案） -->
 <div id="poster-container">
-  <div id="poster" style="width: 375px; padding: 40px 30px; background: linear-gradient(160deg, #1e1b18, #141210); border-radius: 20px; box-sizing: border-box; position: relative;">
+  <div id="poster" style="width: 400px; padding: 40px 30px; background: linear-gradient(160deg, #1e1b18, #141210); border-radius: 20px; box-sizing: border-box; position: relative;">
+    
     <div style="text-align: center; color: #d4af37; font-size: 12px; letter-spacing: 3px; margin-bottom: 20px; font-weight: bold;">LITERARY TEST</div>
+    
+    <!-- 头像和名字 -->
     <div id="p-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #2a241d; border: 2px solid #d4af37; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: #f3e5ab; font-size: 28px; font-weight: bold;"></div>
-    <div id="p-name" style="text-align: center; color: #f3e5ab; font-size: 24px; font-weight: bold; margin-bottom: 5px;"></div>
-    <div id="p-label" style="text-align: center; color: #d4af37; font-size: 13px; margin-bottom: 25px;"></div>
-    <div id="p-quote" style="font-size: 14px; color: #f0e6d2; font-style: italic; text-align: center; line-height: 1.6; margin-bottom: 25px; padding: 8px 10px; border-left: 2px solid #d4af37; border-right: 2px solid #d4af37;"></div>
+    <div id="p-name" style="text-align: center; color: #f3e5ab; font-size: 26px; font-weight: bold; margin-bottom: 5px;"></div>
+    <div id="p-label" style="text-align: center; color: #d4af37; font-size: 14px; margin-bottom: 30px;"></div>
+    
+    <!-- 深度分析框 -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid #3d3226; border-radius: 16px; padding: 24px; text-align: left; margin-bottom: 25px;">
+      <div style="color: #d4af37; font-size: 15px; font-weight: bold; margin-bottom: 10px;">灵魂画像</div>
+      <div id="p-desc" style="color: #b8ac98; font-size: 14px; line-height: 1.8; margin-bottom: 20px;"></div>
+      
+      <div style="color: #d4af37; font-size: 15px; font-weight: bold; margin-bottom: 10px;">你的高光</div>
+      <div id="p-strength" style="color: #b8ac98; font-size: 14px; line-height: 1.8; margin-bottom: 20px;"></div>
+      
+      <div style="color: #d4af37; font-size: 15px; font-weight: bold; margin-bottom: 10px;">潜在盲区</div>
+      <div id="p-weakness" style="color: #b8ac98; font-size: 14px; line-height: 1.8;"></div>
+    </div>
+    
+    <!-- 名言 -->
+    <div id="p-quote" style="font-size: 15px; color: #f0e6d2; font-style: italic; text-align: left; line-height: 1.6; margin-bottom: 30px; padding: 0 10px; border-left: 3px solid #d4af37;"></div>
+    
     <div style="border-top: 1px dashed #3d3226; margin-bottom: 20px;"></div>
-    <div style="text-align: center; font-size: 12px; color: #9a8c76; margin-bottom: 25px;">
-      <p style="margin-bottom: 5px;">长按识别二维码，测测你的隐藏灵魂</p>
-      <div style="width: 60px; height: 60px; background: #333; margin: 0 auto; border-radius: 4px; color: #666; font-size: 10px; line-height: 60px;">二维码</div>
+    
+    <!-- 底部二维码区 -->
+    <div style="text-align: center; font-size: 12px; color: #9a8c76;">
+      <p style="margin-bottom: 8px;">长按识别二维码，测测你的隐藏灵魂</p>
+      <!-- 这里用了一个灰色方块占位，后续你可以换成你的真实二维码图片 -->
+      <div style="width: 70px; height: 70px; background: #333; margin: 0 auto; border-radius: 4px; color: #666; font-size: 12px; line-height: 70px;">二维码</div>
     </div>
   </div>
 </div>
@@ -209,9 +232,14 @@ function generatePoster() {
   const btn = document.getElementById("saveBtn");
   btn.textContent = "生成中...";
   const r = results[currentResultKey];
+  
+  // 将全部内容注入到海报模板里
   document.getElementById("p-avatar").textContent = r.avatar;
   document.getElementById("p-name").textContent = currentResultKey;
   document.getElementById("p-label").textContent = r.label;
+  document.getElementById("p-desc").textContent = r.desc;
+  document.getElementById("p-strength").textContent = r.strength;
+  document.getElementById("p-weakness").textContent = r.weakness;
   document.getElementById("p-quote").textContent = r.quote;
 
   // 确保在手机端截图时，DOM已经完全渲染
@@ -225,32 +253,33 @@ function generatePoster() {
       const imgData = canvas.toDataURL("image/jpeg", 0.9);
       
       const overlay = document.createElement("div");
-      overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;";
+      overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:20px;";
       
       const img = document.createElement("img");
       img.src = imgData;
-      img.style.cssText = "width:80%;max-width:375px;border-radius:12px;box-shadow: 0 10px 30px rgba(0,0,0,0.5);";
+      // 限制最大高度，确保长图也能完整看全，且能长按
+      img.style.cssText = "width:90%;max-width:400px;border-radius:12px;box-shadow: 0 10px 30px rgba(0,0,0,0.5);margin-top:40px;";
       
       const tip = document.createElement("div");
-      tip.textContent = "长按上方图片保存到相册";
-      tip.style.cssText = "color:#d4af37;margin-top:20px;font-size:16px;font-weight:bold;";
+      tip.textContent = "长按上方完整报告保存到相册";
+      tip.style.cssText = "color:#d4af37;margin-top:20px;font-size:16px;font-weight:bold;margin-bottom:40px;";
       
       const closeBtn = document.createElement("div");
       closeBtn.textContent = "✕ 关闭";
-      closeBtn.style.cssText = "position:absolute;top:20px;right:20px;color:#fff;font-size:14px;padding:10px;";
+      closeBtn.style.cssText = "position:absolute;top:20px;right:20px;color:#fff;font-size:14px;padding:10px;background:rgba(255,255,255,0.1);border-radius:20px;";
       closeBtn.onclick = () => document.body.removeChild(overlay);
 
       overlay.appendChild(img);
       overlay.appendChild(tip);
       overlay.appendChild(closeBtn);
       document.body.appendChild(overlay);
-      btn.textContent = "生成图片";
+      btn.textContent = "生成完整报告图片";
     }).catch(err => {
       console.error(err);
       alert("图片生成失败，请直接截图保存～");
-      btn.textContent = "生成图片";
+      btn.textContent = "生成完整报告图片";
     });
-  }, 100);
+  }, 150); // 加150ms延迟确保文字全部塞进去了
 }
 
 function restart() {
