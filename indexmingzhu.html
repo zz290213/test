@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>测测你是哪本名著里的谁</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #1a1612; color: #e8dcc8; min-height: 100vh;
+    display: flex; justify-content: center; align-items: center; padding: 20px;
+  }
+  .app {
+    width: 100%; max-width: 420px;
+    background: linear-gradient(160deg, #241e18 0%, #1a1612 100%);
+    border: 1px solid #3d3226; border-radius: 20px;
+    padding: 32px 24px; min-height: 520px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .app::before {
+    content:""; position:absolute; top:-60px; right:-60px;
+    width:180px; height:180px;
+    background: radial-gradient(circle, rgba(200,169,110,0.15), transparent 70%);
+    border-radius:50%;
+  }
+  .hidden { display:none !important; }
+  .cover { text-align:center; position:relative; z-index:1; }
+  .cover .eyebrow { font-size:12px; letter-spacing:4px; color:#c8a96e; margin-bottom:18px; }
+  .cover h1 { font-size:28px; line-height:1.4; color:#f0e6d2; font-weight:600; margin-bottom:14px; }
+  .cover .sub { font-size:14px; color:#9a8c76; line-height:1.7; margin-bottom:36px; }
+  .btn {
+    display:inline-block; width:100%; padding:15px; border:none; border-radius:12px;
+    background: linear-gradient(135deg, #c8a96e, #a8874e);
+    color:#1a1612; font-size:16px; font-weight:700; letter-spacing:1px;
+    cursor:pointer; transition:transform .15s, opacity .15s;
+  }
+  .btn:active { transform:scale(.97); opacity:.9; }
+  .quiz { position:relative; z-index:1; }
+  .progress-wrap { margin-bottom:28px; }
+  .progress-text { font-size:12px; color:#9a8c76; margin-bottom:8px; text-align:right; }
+  .progress-bar { height:4px; background:#3d3226; border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; width:16.6%; background:linear-gradient(90deg,#c8a96e,#e0c88e); border-radius:2px; transition:width .3s ease; }
+  .q-title { font-size:19px; line-height:1.6; color:#f0e6d2; margin-bottom:24px; font-weight:600; }
+  .options { display:flex; flex-direction:column; gap:12px; }
+  .option {
+    padding:16px 18px; border:1px solid #3d3226; border-radius:12px;
+    font-size:15px; line-height:1.6; color:#d8ccb8; cursor:pointer;
+    background:rgba(255,255,255,0.02); transition:all .18s;
+  }
+  .option:active, .option.selected {
+    border-color:#c8a96e; background:rgba(200,169,110,0.12); color:#f0e6d2;
+  }
+  .result { text-align:center; position:relative; z-index:1; }
+  .result .tag { font-size:12px; letter-spacing:3px; color:#c8a96e; margin-bottom:16px; }
+  .result .avatar {
+    width:88px; height:88px; border-radius:50%; margin:0 auto 18px;
+    background:linear-gradient(135deg,#3d3226,#241e18);
+    border:2px solid #c8a96e; display:flex; align-items:center; justify-content:center;
+    font-size:32px; font-weight:700; color:#e0c88e;
+  }
+  .result h2 { font-size:26px; color:#f0e6d2; margin-bottom:8px; }
+  .result .label { font-size:14px; color:#c8a96e; margin-bottom:22px; letter-spacing:1px; }
+  .result .desc {
+    font-size:15px; line-height:1.9; color:#b8ac98; text-align:left;
+    background:rgba(255,255,255,0.03); border-left:2px solid #c8a96e;
+    padding:18px 20px; border-radius:0 10px 10px 0; margin-bottom:26px;
+  }
+  .result .disclaimer { font-size:11px; color:#6b6050; line-height:1.6; margin-bottom:22px; }
+  .btn-again {
+    background:transparent; border:1px solid #c8a96e; color:#c8a96e;
+    font-size:15px; padding:14px; border-radius:12px; width:100%; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div id="cover" class="cover">
+    <div class="eyebrow">L I T E R A R Y · T E S T</div>
+    <h1>测测你是<br>哪本名著里的谁</h1>
+    <p class="sub">6 道题，看看你骨子里住着<br>哪个文学人物的灵魂</p>
+    <button class="btn" onclick="startQuiz()">开始测试</button>
+  </div>
+
+  <div id="quiz" class="quiz hidden">
+    <div class="progress-wrap">
+      <div class="progress-text" id="progressText">1 / 6</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="q-title" id="qTitle"></div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <div id="result" class="result hidden">
+    <div class="tag">YOUR ARCHETYPE</div>
+    <div class="avatar" id="rAvatar"></div>
+    <h2 id="rName"></h2>
+    <div class="label" id="rLabel"></div>
+    <div class="desc" id="rDesc"></div>
+    <p class="disclaimer">本测试仅供娱乐，不具备任何专业诊断效力。</p>
+    <button class="btn-again" onclick="restart()">再测一次</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    q: "朋友深夜找你倾诉糟心事，你的第一反应是？",
+    opts: [
+      { t: "陪她一起难过，说着说着自己也想哭了", k: "A" },
+      { t: "先听她说完，然后帮她理清楚下一步该怎么做", k: "B" },
+      { t: "“谁欺负你了？我现在就去找他算账”", k: "C" },
+      { t: "安静听完，问一句：“你觉得最让你难受的点是什么？”", k: "D" }
+    ]
+  },
+  {
+    q: "你走进一个全是陌生人的聚会，通常会？",
+    opts: [
+      { t: "找个角落坐下，默默观察谁看起来比较面善", k: "A" },
+      { t: "主动找一两个人聊，话题合适就继续，不合适就撤", k: "B" },
+      { t: "直接加入最热闹的那一堆，先玩起来再说", k: "C" },
+      { t: "站在旁边听，脑子里在分析这群人的关系网", k: "D" }
+    ]
+  },
+  {
+    q: "遇到一个你很想做但所有人都说“不靠谱”的事，你会？",
+    opts: [
+      { t: "纠结很久，最后还是放弃了，但心里一直惦记", k: "A" },
+      { t: "自己偷偷准备，等有把握了再拿出来", k: "B" },
+      { t: "“不试试怎么知道不行？” 先干了再说", k: "C" },
+      { t: "花一个晚上把风险和收益列清楚，再决定", k: "D" }
+    ]
+  },
+  {
+    q: "你最受不了身边的人哪种行为？",
+    opts: [
+      { t: "冷漠，对别人的情绪完全不在意", k: "A" },
+      { t: "虚伪，当面一套背后一套", k: "B" },
+      { t: "磨叽，明明能动手的事非要开会讨论", k: "C" },
+      { t: "蠢，同样的问题反复犯还不自知", k: "D" }
+    ]
+  },
+  {
+    q: "如果明天不用上班/上学，你最想怎么过？",
+    opts: [
+      { t: "窝在家里，拉上窗帘看一部老电影或小说", k: "A" },
+      { t: "约一两个真正聊得来的朋友，找个安静地方坐坐", k: "B" },
+      { t: "临时起意去个没去过的地方，越随性越好", k: "C" },
+      { t: "把积压的事情整理清楚，顺便研究点自己感兴趣的东西", k: "D" }
+    ]
+  },
+  {
+    q: "别人对你的评价里，哪一句你最愿意认领？",
+    opts: [
+      { t: "“你很懂人，也很容易受伤”", k: "A" },
+      { t: "“你看起来好说话，但其实很有原则”", k: "B" },
+      { t: "“你这个人，活得很带劲”", k: "C" },
+      { t: "“你想得比一般人多，也比一般人冷静”", k: "D" }
+    ]
+  }
+];
+
+const results = {
+  A: {
+    name: "林黛玉",
+    label: "敏感细腻型 · 红楼一梦",
+    avatar: "黛",
+    desc: "你是那种把感受放在第一位的人。别人眼里的小事，在你心里会泛起很久的涟漪。敏感不是缺点，它让你比别人更早察觉到空气里的不对劲，也让你更懂温柔是什么。只是别让内耗把你困住。"
+  },
+  B: {
+    name: "简·爱",
+    label: "清醒独立型 · 灵魂平等",
+    avatar: "简",
+    desc: "你看起来温和，骨子里却有很硬的底线。你可以妥协，但不会为了讨好谁而丢掉自己。你相信平等的关系，也愿意为值得的人付出，前提是对方尊重你的独立。"
+  },
+  C: {
+    name: "孙悟空",
+    label: "不服就干型 · 齐天大圣",
+    avatar: "悟",
+    desc: "你受不了磨叽和弯弯绕绕。看到问题就想解决，看到不公就想站出来。你的能量很高，但也容易因为太直接而碰壁。有时候慢一点、绕一步，你的战斗力反而能用在更关键的地方。"
+  },
+  D: {
+    name: "福尔摩斯",
+    label: "冷静观察型 · 推理至上",
+    avatar: "福",
+    desc: "你习惯先观察再行动。人群里你话不多，但脑子里一直在转。你不太容易被情绪带着走，更相信逻辑和证据。这让你在做判断时比别人稳，但也可能让人觉得你有点远。"
+  }
+};
+
+let current = 0;
+let scores = { A:0, B:0, C:0, D:0 };
+
+function startQuiz() {
+  current = 0;
+  scores = { A:0, B:0, C:0, D:0 };
+  document.getElementById("cover").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById("progressText").textContent = (current + 1) + " / " + questions.length;
+  document.getElementById("progressFill").style.width = ((current + 1) / questions.length * 100) + "%";
+  document.getElementById("qTitle").textContent = q.q;
+
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+  q.opts.forEach(function(opt) {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.textContent = opt.t;
+    div.onclick = function() { choose(opt.k); };
+    box.appendChild(div);
+  });
+}
+
+function choose(k) {
+  scores[k]++;
+  current++;
+  if (current < questions.length) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  let best = "A";
+  for (const k in scores) {
+    if (scores[k] > scores[best]) best = k;
+  }
+  const r = results[best];
+  document.getElementById("rAvatar").textContent = r.avatar;
+  document.getElementById("rName").textContent = r.name;
+  document.getElementById("rLabel").textContent = r.label;
+  document.getElementById("rDesc").textContent = r.desc;
+
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+}
+
+function restart() {
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("cover").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
