@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root { --bg:#141210; --card:#1e1b18; --pri:#d4af37; --pri-l:#f3e5ab; --txt:#f0e6d2; --sub:#9a8c76; --bor:#3d3226; }
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   body { font-family: -apple-system, "PingFang SC", sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px; }
   .app { width: 100%; max-width: 440px; background: var(--card); border: 1px solid var(--bor); border-radius: 24px; padding: 36px 24px; min-height: 580px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
   .hidden { display:none !important; }
@@ -19,24 +19,27 @@
   .progress-text { font-size:12px; color:var(--pri); margin-bottom:10px; text-align:right; font-weight:600; }
   .progress-bar { height:6px; background:var(--bor); border-radius:3px; overflow:hidden; margin-bottom:30px;}
   .progress-fill { height:100%; width:6.6%; background:var(--pri); transition:width .3s; }
-  .q-title { font-size:19px; line-height:1.6; color:var(--txt); margin-bottom:24px; }
+  .q-title { font-size:19px; line-height:1.6; color:var(--txt); margin-bottom:24px; font-weight:600;}
   .options { display:flex; flex-direction:column; gap:12px; }
-  .option { padding:16px 18px; border:1.5px solid var(--bor); border-radius:14px; font-size:14px; color:#c4b7a3; cursor:pointer; background:rgba(255,255,255,0.02); }
-  .option:active, .option.selected { border-color:var(--pri); background:rgba(212,175,55,0.1); color:var(--pri-l); }
-  .result { text-align:center; position:relative; z-index:1; }
+  .option { padding:16px 18px; border:1.5px solid var(--bor); border-radius:14px; font-size:14px; color:#c4b7a3; cursor:pointer; background:rgba(255,255,255,0.02); transition:all .2s;}
+  .option:active, .option.selected { border-color:var(--pri); background:rgba(212,175,55,0.1); color:var(--pri-l); transform: scale(0.98);}
+  .result { text-align:center; position:relative; z-index:1; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
   .result .avatar { width:100px; height:100px; border-radius:50%; margin:0 auto 20px; background:var(--bg); border:2px solid var(--pri); display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:700; color:var(--pri-l); }
-  .result h2 { font-size:28px; color:var(--pri-l); margin-bottom:8px; }
-  .result .label { font-size:14px; color:var(--pri); margin-bottom:24px; }
+  .result h2 { font-size:28px; color:var(--pri-l); margin-bottom:8px; font-weight:700;}
+  .result .label { font-size:14px; color:var(--pri); margin-bottom:24px; font-weight:600;}
   .result-card { background:rgba(255,255,255,0.03); border: 1px solid var(--bor); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 20px; }
-  .result-card h3 { font-size: 14px; color: var(--pri); margin-bottom: 8px; }
+  .result-card h3 { font-size: 14px; color: var(--pri); margin-bottom: 8px; font-weight:600;}
   .result-card p { font-size: 14px; line-height: 1.8; color: #b8ac98; margin-bottom: 16px; }
   .result-card p:last-child { margin-bottom: 0; }
-  .quote { font-size: 13px; font-style: italic; color: var(--pri-l); border-left: 3px solid var(--pri); padding-left: 12px; margin: 20px 0; text-align: left; }
+  .quote { font-size: 13px; font-style: italic; color: var(--pri-l); border-left: 3px solid var(--pri); padding-left: 12px; margin: 20px 0; text-align: left; line-height:1.6;}
   .disclaimer { font-size:11px; color:#6b6050; margin-bottom:24px; }
   .action-btns { display: flex; gap: 12px; }
   .btn-save { flex: 1; background: var(--pri); border: none; color: var(--bg); font-size:15px; padding:15px; border-radius:14px; font-weight:700; cursor:pointer;}
   .btn-again { flex: 1; background:transparent; border:1.5px solid var(--bor); color:var(--sub); font-size:15px; padding:15px; border-radius:14px; cursor:pointer;}
-  #poster-container { position: absolute; top: -9999px; left: -9999px; }
+  
+  /* 隐藏海报区 */
+  #poster-container { position: absolute; top: -9999px; left: -9999px; z-index: -1; }
 </style>
 </head>
 <body>
@@ -73,14 +76,19 @@
   </div>
 </div>
 
+<!-- 生成海报的模板 -->
 <div id="poster-container">
-  <div id="poster" style="width: 375px; padding: 40px 30px; background: #1e1b18; border-radius: 20px;">
-    <div style="text-align: center; color: #d4af37; font-size: 12px; letter-spacing: 3px; margin-bottom: 20px;">LITERARY TEST</div>
+  <div id="poster" style="width: 375px; padding: 40px 30px; background: linear-gradient(160deg, #1e1b18, #141210); border-radius: 20px; box-sizing: border-box; position: relative;">
+    <div style="text-align: center; color: #d4af37; font-size: 12px; letter-spacing: 3px; margin-bottom: 20px; font-weight: bold;">LITERARY TEST</div>
     <div id="p-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #2a241d; border: 2px solid #d4af37; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: #f3e5ab; font-size: 28px; font-weight: bold;"></div>
     <div id="p-name" style="text-align: center; color: #f3e5ab; font-size: 24px; font-weight: bold; margin-bottom: 5px;"></div>
     <div id="p-label" style="text-align: center; color: #d4af37; font-size: 13px; margin-bottom: 25px;"></div>
     <div id="p-quote" style="font-size: 14px; color: #f0e6d2; font-style: italic; text-align: center; line-height: 1.6; margin-bottom: 25px; padding: 8px 10px; border-left: 2px solid #d4af37; border-right: 2px solid #d4af37;"></div>
-    <div style="text-align: center; font-size: 10px; color: #666;">长按识别，测测你的隐藏人格</div>
+    <div style="border-top: 1px dashed #3d3226; margin-bottom: 20px;"></div>
+    <div style="text-align: center; font-size: 12px; color: #9a8c76; margin-bottom: 25px;">
+      <p style="margin-bottom: 5px;">长按识别二维码，测测你的隐藏灵魂</p>
+      <div style="width: 60px; height: 60px; background: #333; margin: 0 auto; border-radius: 4px; color: #666; font-size: 10px; line-height: 60px;">二维码</div>
+    </div>
   </div>
 </div>
 
@@ -206,33 +214,43 @@ function generatePoster() {
   document.getElementById("p-label").textContent = r.label;
   document.getElementById("p-quote").textContent = r.quote;
 
-  html2canvas(document.getElementById("poster"), { scale: 2, useCORS: true, backgroundColor: "#141210" }).then(canvas => {
-    const imgData = canvas.toDataURL("image/jpeg", 0.9);
-    const overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;";
-    
-    const img = document.createElement("img");
-    img.src = imgData;
-    img.style.cssText = "width:80%;max-width:375px;border-radius:12px;";
-    
-    const tip = document.createElement("div");
-    tip.textContent = "长按图片保存到相册";
-    tip.style.cssText = "color:#d4af37;margin-top:20px;font-size:16px;font-weight:bold;";
-    
-    const closeBtn = document.createElement("div");
-    closeBtn.textContent = "✕";
-    closeBtn.style.cssText = "position:absolute;top:20px;right:20px;color:#fff;font-size:30px;";
-    closeBtn.onclick = () => document.body.removeChild(overlay);
+  // 确保在手机端截图时，DOM已经完全渲染
+  setTimeout(() => {
+    html2canvas(document.getElementById("poster"), { 
+      scale: 2, 
+      useCORS: true, 
+      backgroundColor: "#141210",
+      allowTaint: true 
+    }).then(canvas => {
+      const imgData = canvas.toDataURL("image/jpeg", 0.9);
+      
+      const overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;";
+      
+      const img = document.createElement("img");
+      img.src = imgData;
+      img.style.cssText = "width:80%;max-width:375px;border-radius:12px;box-shadow: 0 10px 30px rgba(0,0,0,0.5);";
+      
+      const tip = document.createElement("div");
+      tip.textContent = "长按上方图片保存到相册";
+      tip.style.cssText = "color:#d4af37;margin-top:20px;font-size:16px;font-weight:bold;";
+      
+      const closeBtn = document.createElement("div");
+      closeBtn.textContent = "✕ 关闭";
+      closeBtn.style.cssText = "position:absolute;top:20px;right:20px;color:#fff;font-size:14px;padding:10px;";
+      closeBtn.onclick = () => document.body.removeChild(overlay);
 
-    overlay.appendChild(img);
-    overlay.appendChild(tip);
-    overlay.appendChild(closeBtn);
-    document.body.appendChild(overlay);
-    btn.textContent = "生成图片";
-  }).catch(err => {
-    alert("生成失败，请截图保存～");
-    btn.textContent = "生成图片";
-  });
+      overlay.appendChild(img);
+      overlay.appendChild(tip);
+      overlay.appendChild(closeBtn);
+      document.body.appendChild(overlay);
+      btn.textContent = "生成图片";
+    }).catch(err => {
+      console.error(err);
+      alert("图片生成失败，请直接截图保存～");
+      btn.textContent = "生成图片";
+    });
+  }, 100);
 }
 
 function restart() {
