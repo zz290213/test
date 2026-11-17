@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>测测你是哪本名著里的谁</title>
-<!-- 引入截图库 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
@@ -58,13 +57,13 @@
   .progress-wrap { margin-bottom:30px; }
   .progress-text { font-size:12px; color:var(--primary); margin-bottom:10px; text-align:right; font-weight:600; letter-spacing: 1px;}
   .progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
-  .progress-fill { height:100%; width:10%; background:linear-gradient(90deg,var(--primary),var(--primary-light)); border-radius:3px; transition:width .3s ease; }
+  .progress-fill { height:100%; width:6.6%; background:linear-gradient(90deg,var(--primary),var(--primary-light)); border-radius:3px; transition:width .3s ease; }
   
-  .q-title { font-size:20px; line-height:1.6; color:var(--text-main); margin-bottom:28px; font-weight:600; }
-  .options { display:flex; flex-direction:column; gap:14px; }
+  .q-title { font-size:19px; line-height:1.6; color:var(--text-main); margin-bottom:24px; font-weight:600; }
+  .options { display:flex; flex-direction:column; gap:12px; }
   .option {
-    padding:18px 20px; border:1.5px solid var(--border); border-radius:14px;
-    font-size:15px; line-height:1.5; color:#c4b7a3; cursor:pointer;
+    padding:16px 18px; border:1.5px solid var(--border); border-radius:14px;
+    font-size:14px; line-height:1.5; color:#c4b7a3; cursor:pointer;
     background:rgba(255,255,255,0.02); transition:all .2s;
   }
   .option:active, .option.selected {
@@ -92,11 +91,11 @@
     border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 20px;
   }
   .result-card h3 { font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: 600; }
-  .result-card p { font-size: 15px; line-height: 1.8; color: #b8ac98; margin-bottom: 16px; }
+  .result-card p { font-size: 14px; line-height: 1.8; color: #b8ac98; margin-bottom: 16px; }
   .result-card p:last-child { margin-bottom: 0; }
   
   .quote {
-    font-size: 14px; font-style: italic; color: var(--primary-light);
+    font-size: 13px; font-style: italic; color: var(--primary-light);
     border-left: 3px solid var(--primary); padding-left: 12px; margin: 20px 0;
     line-height: 1.6; text-align: left;
   }
@@ -117,10 +116,7 @@
   }
   .btn-again:active { background: rgba(255,255,255,0.05); color: var(--text-main); }
 
-  /* 隐藏的海报容器，用于生成图片 */
-  #poster-container {
-    position: absolute; top: -9999px; left: -9999px;
-  }
+  #poster-container { position: absolute; top: -9999px; left: -9999px; }
 </style>
 </head>
 <body>
@@ -130,14 +126,14 @@
   <div id="cover" class="cover">
     <div class="eyebrow">L I T E R A R Y · T E S T</div>
     <h1>测测你是<br>哪本名著里的谁</h1>
-    <p class="sub">10 道直击灵魂的选择题<br>看看你骨子里住着哪位文学巨匠的灵魂</p>
+    <p class="sub">15 道直击灵魂的选择题<br>20 种文学巨匠原型，看看你骨子里住着谁</p>
     <button class="btn" onclick="startQuiz()">开启灵魂测试</button>
   </div>
 
   <!-- 答题 -->
   <div id="quiz" class="quiz hidden">
     <div class="progress-wrap">
-      <div class="progress-text" id="progressText">1 / 10</div>
+      <div class="progress-text" id="progressText">1 / 15</div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
     <div class="q-title" id="qTitle"></div>
@@ -172,7 +168,7 @@
 
 </div>
 
-<!-- 隐藏的海报模板 (生成图片专用) -->
+<!-- 隐藏的海报模板 -->
 <div id="poster-container">
   <div id="poster" style="width: 375px; padding: 40px 30px; background: linear-gradient(160deg, #1e1b18, #141210); border-radius: 20px; box-sizing: border-box; position: relative;">
     <div style="text-align: center; color: #d4af37; font-size: 12px; letter-spacing: 3px; margin-bottom: 20px; font-weight: bold;">LITERARY TEST</div>
@@ -183,44 +179,64 @@
     <div style="border-top: 1px dashed #3d3226; margin-bottom: 20px;"></div>
     <div style="text-align: center; font-size: 12px; color: #9a8c76; margin-bottom: 25px;">
       <p style="margin-bottom: 5px;">长按识别二维码，测测你的隐藏灵魂</p>
-      <!-- 这里用一个方块占位，后续你可以换成自己的公众号/小红书二维码 -->
       <div style="width: 60px; height: 60px; background: #333; margin: 0 auto; border-radius: 4px; color: #666; font-size: 10px; line-height: 60px;">二维码</div>
     </div>
-    <div style="text-align: center; font-size: 10px; color: #555; letter-spacing: 1px;">* 本测试仅供娱乐</div>
   </div>
 </div>
 
 <script>
+// 15道精选题目，选项暗中指向不同的特质群
+// 计分逻辑：每个选项会同时给1-3个人物加分，确保20个人物都有机会被选中
 const questions = [
-  { q: "朋友深夜找你倾诉糟心事，你的第一反应是？", opts: [{ t: "陪她一起难过，说着说着自己也想哭了", k: "A" }, { t: "先听她说完，然后帮她理清楚下一步该怎么做", k: "B" }, { t: "“谁欺负你了？我现在就去找他算账”", k: "C" }, { t: "安静听完，问一句：“你觉得最让你难受的点是什么？”", k: "D" }, { t: "先问清楚来龙去脉，脑子里已经在盘算这件事怎么处理最有利", k: "E" }, { t: "跟她讲一个更离谱的故事，试图让她觉得人生本来就荒诞", k: "F" }] },
-  { q: "你走进一个全是陌生人的聚会，通常会？", opts: [{ t: "找个角落坐下，默默观察谁看起来比较面善", k: "A" }, { t: "主动找一两个人聊，话题合适就继续，不合适就撤", k: "B" }, { t: "直接加入最热闹的那一堆，先玩起来再说", k: "C" }, { t: "站在旁边听，脑子里在分析这群人的关系网", k: "D" }, { t: "先判断这场合里谁说话最有分量，然后找机会认识他", k: "E" }, { t: "跟谁都能聊两句，聊着聊着就开始讲自己最近痴迷的事", k: "F" }] },
-  { q: "遇到一个你很想做但所有人都说“不靠谱”的事，你会？", opts: [{ t: "纠结很久，最后还是放弃了，但心里一直惦记", k: "A" }, { t: "自己偷偷准备，等有把握了再拿出来", k: "B" }, { t: "“不试试怎么知道不行？” 先干了再说", k: "C" }, { t: "花一个晚上把风险和收益列清楚，再决定", k: "D" }, { t: "先评估这件事能不能帮我积累资源或话语权，能就干", k: "E" }, { t: "根本不需要别人认可，我想做就去做，哪怕看起来傻", k: "F" }] },
-  { q: "你最受不了身边的人哪种行为？", opts: [{ t: "冷漠，对别人的情绪完全不在意", k: "A" }, { t: "虚伪，当面一套背后一套", k: "B" }, { t: "磨叽，明明能动手的事非要开会讨论", k: "C" }, { t: "蠢，同样的问题反复犯还不自知", k: "D" }, { t: "没野心，明明有机会往上走却自己先退缩", k: "E" }, { t: "太现实，张口闭口都是钱和利益，一点浪漫都没有", k: "F" }] },
-  { q: "如果明天不用上班/上学，你最想怎么过？", opts: [{ t: "窝在家里，拉上窗帘看一部老电影或小说", k: "A" }, { t: "约一两个真正聊得来的朋友，找个安静地方坐坐", k: "B" }, { t: "临时起意去个没去过的地方，越随性越好", k: "C" }, { t: "把积压的事情整理清楚，顺便研究点自己感兴趣的东西", k: "D" }, { t: "约几个有用的人吃饭，顺便把下周要推进的事聊一聊", k: "E" }, { t: "去做一件别人觉得很“没用”但我一直想做的事", k: "F" }] },
-  { q: "别人对你的评价里，哪一句你最愿意认领？", opts: [{ t: "“你很懂人，也很容易受伤”", k: "A" }, { t: "“你看起来好说话，但其实很有原则”", k: "B" }, { t: "“你这个人，活得很带劲”", k: "C" }, { t: "“你想得比一般人多，也比一般人冷静”", k: "D" }, { t: "“你很清楚自己要什么，而且拿得到”", k: "E" }, { t: "“你活在自己的世界里，但那个世界挺有意思”", k: "F" }] },
-  { q: "当团队里出现分歧，大家吵得不可开交时，你通常会？", opts: [{ t: "先不说话，等大家情绪过去，再私下找关键的人聊", k: "A" }, { t: "把各方观点列出来，找一个大家都能接受的折中方案", k: "B" }, { t: "直接拍板：“别吵了，先按这个干，不行再改”", k: "C" }, { t: "安静听完所有人的逻辑漏洞，最后一次性指出来", k: "D" }, { t: "看谁的意见最后会赢，提前站到那一边并帮忙推进", k: "E" }, { t: "提出一个大家都没想到的第三种可能，哪怕听起来不现实", k: "F" }] },
-  { q: "你更相信哪一种力量？", opts: [{ t: "共情。能感受到别人的感受，关系才不会断", k: "A" }, { t: "原则。守住底线，别人才会真正尊重你", k: "B" }, { t: "行动。想再多不如先干一票", k: "C" }, { t: "理性。情绪会骗人，逻辑不会", k: "D" }, { t: "掌控。谁掌握资源和规则，谁说了算", k: "E" }, { t: "信念。别人觉得可笑的东西，我信它就值得", k: "F" }] },
-  { q: "如果让你选一个词形容自己，你会选？", opts: [{ t: "细腻", k: "A" }, { t: "清醒", k: "B" }, { t: "痛快", k: "C" }, { t: "冷静", k: "D" }, { t: "野心", k: "E" }, { t: "痴迷", k: "F" }] },
-  { q: "多年以后，你希望别人怎么记住你？", opts: [{ t: "一个真正懂人、让人感到被看见的人", k: "A" }, { t: "一个不依附谁、始终守住自己的人", k: "B" }, { t: "一个敢打敢冲、活得尽兴的人", k: "C" }, { t: "一个看得最透、判断最准的人", k: "D" }, { t: "一个把局面做大、真正改变规则的人", k: "E" }, { t: "一个敢为别人觉得荒唐的事认真一辈子的人", k: "F" }] }
+  { q: "朋友深夜找你倾诉糟心事，你的第一反应是？", opts: [ { t: "陪她一起难过，自己也想哭", k: ["林黛玉","贾宝玉"] }, { t: "冷静帮她理清下一步怎么做", k: ["简·爱","福尔摩斯","诸葛亮"] }, { t: "“谁欺负你了？我去算账”", k: ["孙悟空","鲁智深","武松"] }, { t: "安静听完，问最让她难受的点", k: ["唐僧","甘地"] }, { t: "盘算这件事怎么处理最有利", k: ["曹操","王熙凤"] }, { t: "讲离谱故事让她觉得人生本就荒诞", k: ["堂吉诃德","李白"] } ] },
+  { q: "走进全是陌生人的聚会，你通常会？", opts: [ { t: "角落坐下，默默观察", k: ["林黛玉","简·爱"] }, { t: "主动找一两个人聊，不合适就撤", k: ["福尔摩斯","郭靖"] }, { t: "加入最热闹的一堆，先玩再说", k: ["孙悟空","王熙凤"] }, { t: "站旁边听，分析关系网", k: ["诸葛亮","曹操"] }, { t: "判断谁最有分量，找机会认识", k: ["于连","曹操"] }, { t: "跟谁都能聊，聊自己痴迷的事", k: ["堂吉诃德","李白"] }] },
+  { q: "遇到很想做但所有人说不靠谱的事，你会？", opts: [ { t: "纠结很久放弃，但心里惦记", k: ["林黛玉","哈姆雷特"] }, { t: "偷偷准备，有把握再拿出来", k: ["简·爱","诸葛亮"] }, { t: "不试试怎么知道，先干了再说", k: ["孙悟空","鲁智深"] }, { t: "列清风险和收益再决定", k: ["福尔摩斯","曹操"] }, { t: "评估能否积累资源话语权，能就干", k: ["王熙凤","于连"] }, { t: "不需要别人认可，哪怕看起来傻", k: ["堂吉诃德","李白"] }] },
+  { q: "你最受不了身边的人哪种行为？", opts: [ { t: "冷漠，不在意别人情绪", k: ["林黛玉","贾宝玉"] }, { t: "虚伪，当面一套背后一套", k: ["简·爱","武松"] }, { t: "磨叽，能动手非要开会", k: ["孙悟空","鲁智深"] }, { t: "蠢，同样的问题反复犯", k: ["福尔摩斯","诸葛亮"] }, { t: "没野心，有机会却退缩", k: ["曹操","于连"] }, { t: "太现实，张口闭口钱和利益", k: ["堂吉诃德","李白"] }] },
+  { q: "如果明天不用上班/上学，你最想怎么过？", opts: [ { t: "窝在家里看老电影或小说", k: ["林黛玉","哈姆雷特"] }, { t: "约一两个知己，安静地方坐坐", k: ["简·爱","郭靖"] }, { t: "临时起意去没去过的地方", k: ["孙悟空","李白"] }, { t: "整理积压事情，研究感兴趣的东西", k: ["福尔摩斯","诸葛亮"] }, { t: "约有用的人吃饭，聊下周推进的事", k: ["曹操","王熙凤"] }, { t: "做一件别人觉得没用但我想做的事", k: ["堂吉诃德","李白"] }] },
+  { q: "别人对你的评价，哪句你最愿意认领？", opts: [ { t: "你很懂人，也很容易受伤", k: ["林黛玉","贾宝玉"] }, { t: "你看起来好说话，其实有原则", k: ["简·爱","郭靖"] }, { t: "你这个人活得很带劲", k: ["孙悟空","鲁智深"] }, { t: "你想得比一般人多，也更冷静", k: ["福尔摩斯","诸葛亮"] }, { t: "你很清楚自己要什么，且拿得到", k: ["曹操","于连"] }, { t: "你活在另一个有趣的世界里", k: ["堂吉诃德","李白"] }] },
+  { q: "当团队里出现分歧大家吵得不可开交时，你通常会？", opts: [ { t: "先不讲话，等情绪过去再私下聊", k: ["林黛玉","简·爱"] }, { t: "列出观点，找折中方案", k: ["郭靖","唐僧"] }, { t: "直接拍板：先按这个干，不行再改", k: ["孙悟空","武松"] }, { t: "听完逻辑漏洞，最后一次性指出", k: ["福尔摩斯","诸葛亮"] }, { t: "看谁的意见会赢，提前站队推进", k: ["曹操","王熙凤"] }, { t: "提出大家都没想到的第三种可能", k: ["堂吉诃德","李白"] }] },
+  { q: "你更相信哪一种力量？", opts: [ { t: "共情。能感受到别人的感受", k: ["林黛玉","贾宝玉"] }, { t: "原则。守住底线才能被尊重", k: ["简·爱","武松"] }, { t: "行动。想再多不如先干一票", k: ["孙悟空","鲁智深"] }, { t: "理性。情绪会骗人，逻辑不会", k: ["福尔摩斯","诸葛亮"] }, { t: "掌控。掌握规则谁说了算", k: ["曹操","王熙凤"] }, { t: "信念。别人觉得可笑我也信", k: ["堂吉诃德","唐僧"] }] },
+  { q: "如果让你选一个词形容自己，你会选？", opts: [ { t: "细腻", k: ["林黛玉","哈姆雷特"] }, { t: "清醒", k: ["简·爱","福尔摩斯"] }, { t: "痛快", k: ["孙悟空","武松"] }, { t: "冷静", k: ["诸葛亮","福尔摩斯"] }, { t: "野心", k: ["曹操","于连"] }, { t: "痴迷", k: ["堂吉诃德","李白"] }] },
+  { q: "多年以后，你希望别人怎么记住你？", opts: [ { t: "一个真正懂人的人", k: ["林黛玉","唐僧"] }, { t: "一个不依附谁的独立者", k: ["简·爱","武松"] }, { t: "一个敢打敢冲活得尽兴的人", k: ["孙悟空","鲁智深"] }, { t: "一个判断最准的智者", k: ["福尔摩斯","诸葛亮"] }, { t: "一个改变规则做大局面的人", k: ["曹操","王熙凤"] }, { t: "一个认真追逐荒唐梦的人", k: ["堂吉诃德","李白"] }] },
+  { q: "面对绝对不公的规则，你会？", opts: [ { t: "心里悲愤，但默默忍受", k: ["林黛玉","哈姆雷特"] }, { t: "按规则找漏洞，智取", k: ["福尔摩斯","诸葛亮"] }, { t: "直接把桌子掀了", k: ["孙悟空","武松","鲁智深"] }, { t: "带着弱者一起反抗", k: ["简·爱","郭靖"] }, { t: "利用规则为自己谋最大利益", k: ["曹操","于连"] }, { t: "坚持自己心中的道义底线", k: ["唐僧","堂吉诃德"] }] },
+  { q: "如果遭遇了重大的情感背叛，你会？", opts: [ { t: "绝望心碎，很久走不出来", k: ["林黛玉","哈姆雷特"] }, { t: "决绝离开，绝不回头", k: ["简·爱","武松"] }, { t: "当面质问，甚至不惜动手", k: ["孙悟空","鲁智深"] }, { t: "收集证据，让对方付出代价", k: ["曹操","福尔摩斯","王熙凤"] }, { t: "反思自己，选择原谅和包容", k: ["唐僧","郭靖"] }, { t: "相信那是命运开的荒诞玩笑", k: ["堂吉诃德","李白"] }] },
+  { q: "你如何看待金钱与权力？", opts: [ { t: "没感觉，精神契合最重要", k: ["林黛玉","贾宝玉"] }, { t: "要独立，钱是底气", k: ["简·爱","于连"] }, { t: "是拿来打破束缚的工具", k: ["孙悟空","武松"] }, { t: "是社会运转的底层逻辑", k: ["福尔摩斯","曹操","诸葛亮"] }, { t: "是必须要赢的游戏", k: ["王熙凤","于连"] }, { t: "身外之物，不值一提", k: ["堂吉诃德","李白","唐僧"] }] },
+  { q: "朋友找你借一笔不小的钱，你会？", opts: [ { t: "心疼对方，直接借", k: ["贾宝玉","唐僧"] }, { t: "量力而行，救急不救穷", k: ["简·爱","郭靖"] }, { t: "“我的钱也不是大风刮来的”", k: ["王熙凤","于连"] }, { t: "写个借条，约定利息和归还日期", k: ["曹操","诸葛亮"] }, { t: "一码归一码，打听清楚原因再说", k: ["福尔摩斯","哈姆雷特"] }, { t: "看心情，豪气地请客或借出", k: ["孙悟空","鲁智深","李白"] }] },
+  { q: "你觉得自己身上最矛盾的一点是？", opts: [ { t: "渴望被懂又害怕被看透", k: ["林黛玉","哈姆雷特"] }, { t: "外表随和内心极度挑剔", k: ["简·爱","福尔摩斯"] }, { t: "明明很要强却容易心软", k: ["孙悟空","武松"] }, { t: "想掌控一切又嫌麻烦", k: ["曹操","王熙凤"] }, { t: "理想主义却又渴望世俗成功", k: ["于连","堂吉诃德"] }, { t: "觉得人间无聊又想济世救人", k: ["李白","唐僧","郭靖"] }] }
 ];
 
+// 20个人物的详细数据（为你打造了非常有传播力的文案）
 const results = {
-  A: { name: "林黛玉", label: "敏感细腻型 · 红楼一梦", avatar: "黛", desc: "你是那种把感受放在第一位的人。别人眼里的小事，在你心里会泛起很久的涟漪。你有着极高的情感分辨率。", strength: "极高的共情力与艺术直觉。你懂人性的幽微，能给人提供深度的情绪价值。", weakness: "容易陷入精神内耗，过度咀嚼负面情绪。有时候，钝感力是你需要学习的课题。", quote: "“我就是个多愁多病身，你就是那倾国倾城貌。”" },
-  B: { name: "简·爱", label: "清醒独立型 · 灵魂平等", avatar: "简", desc: "你看起来温和，骨子里却有很硬的底线。你可以妥协，但不会为了讨好谁而丢掉自己。你相信平等的灵魂。", strength: "强大的内核与自尊。无论身处何种逆境，你都有重新站起来的底气。", weakness: "有时过于倔强，可能会把真正关心你的人推远。适度的柔软并非软弱。", quote: "“你以为我穷、低微、不美，就没有灵魂没有心吗？”" },
-  C: { name: "孙悟空", label: "不服就干型 · 齐天大圣", avatar: "悟", desc: "你受不了磨叽和弯弯绕绕。看到问题就想解决，看到不公就想站出来。你崇尚自由，有着极强的行动力。", strength: "敢想敢做，永远充满生命力。在困境中，你往往是最先找到出路的那个人。", weakness: "容易因为太直接而碰壁，缺乏耐心。有时候慢一点、绕一步，战力反而更强。", quote: "“皇帝轮流做，明年到我家。”" },
-  D: { name: "福尔摩斯", label: "冷静观察型 · 推理至上", avatar: "福", desc: "你习惯先观察再行动。人群里你话不多，但脑子里一直在转。你不太容易被情绪带着走，更相信逻辑和证据。", strength: "极强的理性思维与专注力。在混乱中，你总能一眼看穿事物的本质。", weakness: "可能显得缺乏人情味，让人觉得有距离感。并非所有问题都能用逻辑解决。", quote: "“排除一切不可能，剩下的即使再不可思议，那也是真相。”" },
-  E: { name: "曹操", label: "掌控野心型 · 乱世枭雄", avatar: "曹", desc: "你天生对“局面”敏感。别人看到的是人和事，你看到的是资源和位置。你不喜欢被安排，更愿意自己定规则。", strength: "卓越的统筹力与决断力。你能团结各方力量，去达成一个宏大的目标。", weakness: "掌控欲过强容易让身边人感到压抑。偶尔放下目的，去享受无用的快乐。", quote: "“宁教我负天下人，休教天下人负我。”" },
-  F: { name: "堂吉诃德", label: "理想主义型 · 痴心骑士", avatar: "堂", desc: "你心里有一套自己的世界，而且不太愿意为了现实把它改小。别人觉得你痴、你傻，但你知道自己在认真对待什么。", strength: "永不熄灭的信念感与热情。即使所有人都不看好，你依然敢于为了热爱冲锋。", weakness: "容易脱离现实，活在自己的滤镜里。理想很丰满，但也需要给自己留点退路。", quote: "“我知道我是谁，我知道我想成为谁。”" }
+  "林黛玉": { avatar:"黛", label: "敏感细腻型 · 红楼一梦", desc: "你把感受放在第一位，有着极高的情感分辨率。别人眼里的小事，会在你心里泛起很久的涟漪。", strength: "极高的共情力与艺术直觉，你懂人性的幽微，能提供深度的情绪价值。", weakness: "容易陷入精神内耗。有时候，钝感力是你需要学习的课题。", quote: "“我就是个多愁多病身，你就是那倾国倾城貌。”" },
+  "贾宝玉": { avatar:"宝", label: "多情温柔型 · 怡红公子", desc: "你对世界充满悲悯，特别是对女性和弱者。你讨厌世俗的功名利禄，只想在温柔乡里守护真情。", strength: "极高的同理心与包容度。你身上有着最纯粹的人性光辉，让人想靠近。", weakness: "缺乏现实的执行力，遇到挫折容易逃避。该扛责任时，需要更勇敢一点。", quote: "“女儿是水作的骨肉，男人是泥作的骨肉。”" },
+  "简·爱": { avatar:"简", label: "清醒独立型 · 灵魂平等", desc: "你看起来温和，骨子里却有很硬的底线。你可以妥协，但不会为了讨好谁而丢掉自己。", strength: "强大的内核与自尊。无论身处何种逆境，你都有重新站起来的底气。", weakness: "有时过于倔强，可能会把真正关心你的人推远。适度的柔软并非软弱。", quote: "“你以为我穷、低微、不美，就没有灵魂没有心吗？”" },
+  "孙悟空": { avatar:"悟", label: "不服就干型 · 齐天大圣", desc: "你受不了磨叽和弯弯绕绕。看到问题就想解决，看到不公就想站出来，崇尚自由与实力。", strength: "敢想敢做，永远充满生命力。在困境中，你往往是最先找到出路的那个人。", weakness: "容易因为太直接而碰壁，缺乏耐心。有时候慢一点、绕一步，战力反而更强。", quote: "“皇帝轮流做，明年到我家。”" },
+  "福尔摩斯": { avatar:"福", label: "冷静观察型 · 推理至上", desc: "你习惯先观察再行动。人群里你话不多，但脑子里一直在转，你只相信逻辑与证据。", strength: "极强的理性思维与专注力。在混乱中，你总能一眼看穿事物的本质。", weakness: "可能显得缺乏人情味，让人觉得有距离感。并非所有问题都能用逻辑解决。", quote: "“排除一切不可能，剩下的即使再不可思议，那也是真相。”" },
+  "曹操": { avatar:"曹", label: "掌控野心型 · 乱世枭雄", desc: "你天生对局面敏感。别人看到的是人和事，你看到的是资源和位置。你不喜欢被安排，更愿意自己定规则。", strength: "卓越的统筹力与决断力。你能团结各方力量，去达成一个宏大的目标。", weakness: "掌控欲过强容易让身边人感到压抑。偶尔放下目的，去享受无用的快乐。", quote: "“宁教我负天下人，休教天下人负我。”" },
+  "堂吉诃德": { avatar:"堂", label: "理想主义型 · 痴心骑士", desc: "你心里有一套自己的世界，且不愿为了现实把它改小。别人觉得你痴，但你知道自己在认真对待什么。", strength: "永不熄灭的信念感与热情。即使所有人都不看好，你依然敢于为了热爱冲锋。", weakness: "容易脱离现实，活在自己的滤镜里。理想很丰满，但也需要留点退路。", quote: "“我知道我是谁，我知道我想成为谁。”" },
+  "诸葛亮": { avatar:"亮", label: "运筹帷幄型 · 智绝天下", desc: "你是天生的军师。面对复杂局面，你总能拨开迷雾找到最优解。你极其理智，习惯把一切掌握在计划中。", strength: "无与伦比的逻辑推演能力与大局观。你是团队里最可靠的大脑。", weakness: "太怕出错，事必躬亲。有时候活得过于紧绷，学会放权和接受不完美。", quote: "“鞠躬尽瘁，死而后已。”" },
+  "王熙凤": { avatar:"凤", label: "精明干练型 · 凤辣子", desc: "你八面玲珑，做事雷厉风行。你极其务实，对人情世故和利益关系看得清清楚楚。", strength: "极强的执行力和社交手腕。把你放在任何复杂的团队里，你都能迅速搞定局面。", weakness: "容易因为过于看重利益而树敌。机关算尽太聪明，偶尔真诚一点会轻松很多。", quote: "“我从来不会算计人，只有别人算计我的份。”" },
+  "鲁智深": { avatar:"鲁", label: "路见不平型 · 花和尚", desc: "你粗中有细，最见不得恃强凌弱。只要遇到不平事，你哪怕搭上自己也要拔刀相助。", strength: "极高的正义感与气场。你的直率和仗义，会让你交到一批真正交心的铁哥们。", weakness: "容易冲动行事，不计后果。愤怒涌上心头时，深呼吸三秒钟。", quote: "“洒家放你不下，特来救你。”" },
+  "武松": { avatar:"武", label: "恩怨分明型 · 行者", desc: "你是界限感极强的人。对你好的人，你涌泉相报；触犯你底线的人，你绝不手软。你极其硬核。", strength: "极强的原则性与抗压能力。你不怕事，能扛住极大的压力去保护自己在乎的人和事。", weakness: "执念太深，有时容易走向极端。学会化解伤痛，而不是永远被过去困住。", quote: "“冤有头，债有主。”" },
+  "唐僧": { avatar:"僧", label: "坚定信念型 · 金蝉子", desc: "你有着常人难以企及的毅力和慈悲。只要认准了目标，无论经历多少磨难，你都会一步一个脚印走下去。", strength: "极高的自律和慈悲心。你是团队里的定海神针，能在最绝望时给人希望。", weakness: "有时过于固执，容易被道德绑架或被人欺骗。善意需要长出锋芒。", quote: "“贫僧从东土大唐而来，去往西天拜佛求经。”" },
+  "李白": { avatar:"白", label: "狂放不羁型 · 谪仙人", desc: "你天生自带浪漫和自由基因。你受不了体制的束缚，宁愿在月下独酌，也不愿摧眉折腰事权贵。", strength: "非凡的创造力和感染力。你总能活出别人不敢活的样子，拥有迷人的个人魅力。", weakness: "过于情绪化，容易逃避现实责任。浪漫不能当饭吃，偶尔也要学会落地。", quote: "“仰天大笑出门去，我辈岂是蓬蒿人。”" },
+  "哈姆雷特": { avatar:"哈", label: "深度内耗型 · 忧郁王子", desc: "你是个深思熟虑的人，面对选择总是反复权衡。你脑子里的剧本很多，但在行动前总是容易陷入纠结。", strength: "超乎常人的思想深度，能洞察到事情最复杂的一面，绝不轻率行事。", weakness: "想得太多，做得太少。过度思考会拖垮你的行动力，勇敢迈出第一步吧。", quote: "“生存还是毁灭，这是一个值得考虑的问题。”" },
+  "于连": { avatar:"连", label: "野心勃勃型 · 孤胆攀登", desc: "你不甘平庸，极度渴望跨越阶层。你极其聪明，善于伪装和抓住机会，但在夜深人静时，也会感到内心的撕裂。", strength: "极强的野心和向上攀爬的驱动力。你能忍受常人无法忍受的屈辱，达成目标。", weakness: "容易在追逐欲望的过程中迷失自我，患得患失。别让虚荣心吞噬了真实的你。", quote: "“我绝不向命运低头。”" },
+  "郭靖": { avatar:"靖", label: "大智若愚型 · 侠之大者", desc: "你可能不善言辞，反应也比别人慢半拍，但你的内核无比坚定。你认准的理，哪怕全世界反对你也会坚持。", strength: "极强的定力与责任感。你靠得住、扛得下，是所有人最安心的后盾。", weakness: "有时太轴，不懂得变通。面对情感和复杂的选择，多听听别人的意见。", quote: "“侠之大者，为国为民。”" },
+  "甘地": { avatar:"甘", label: "非暴和平型 · 圣雄", desc: "你相信温柔的力量。面对冲突，你不喜欢对抗，而是习惯用包容和坚守去化解，你的精神力极强。", strength: "极高的精神境界与情绪稳定性。你能用润物细无声的方式，让最强硬的人折服。", weakness: "在现代极度内卷的竞争中，你的隐忍可能会被当成软弱，容易吃亏。", quote: "“以眼还眼，世界只会更盲目。”" },
+  "牧羊少年": { avatar:"羊", label: "天命探索型 · 追梦者", desc: "你听得到内心的声音。相比安稳的生活，你更渴望探索未知的世界，去追寻属于自己的“天命”。", strength: "极强的直觉与行动力，敢于放下存量，去迎接未知的挑战，活得极其鲜活。", weakness: "容易三分钟热度，或者为了追求虚无缥缈的东西，而忽略了眼前的现实。", quote: "“当你想要某种东西时，整个宇宙会合力助你实现。”" },
+  "哈利·波特": { avatar:"哈", label: "勇敢守护型 · 魔法男孩", desc: "你天生有一种正义感和行动力。面对困难和危险，你不会退缩，而是会带着爱与勇气，和朋友一起迎难而上。", strength: "绝对的勇敢与忠诚。面对绝境，你的潜力无穷，总能绝处逢生。", weakness: "有时过于鲁莽，或者因为强出头而把自己置于险境。", quote: "“决定我们成为哪种人的，不是我们的能力，而是我们的选择。”" }
 };
 
 let current = 0;
-let scores = { A:0, B:0, C:0, D:0, E:0, F:0 };
+let scores = {}; // 动态初始化
+Object.keys(results).forEach(k => scores[k] = 0);
 let isAnimating = false;
-let currentResultKey = "A"; // 记录当前结果
+let currentResultKey = "林黛玉";
 
 function startQuiz() {
   current = 0;
-  scores = { A:0, B:0, C:0, D:0, E:0, F:0 };
+  Object.keys(results).forEach(k => scores[k] = 0);
   document.getElementById("cover").classList.add("hidden");
   document.getElementById("result").classList.add("hidden");
   document.getElementById("quiz").classList.remove("hidden");
@@ -231,136 +247,4 @@ function renderQuestion() {
   const q = questions[current];
   document.getElementById("progressText").textContent = (current + 1) + " / " + questions.length;
   document.getElementById("progressFill").style.width = ((current + 1) / questions.length * 100) + "%";
-  document.getElementById("qTitle").textContent = q.q;
-
-  const box = document.getElementById("options");
-  box.innerHTML = "";
-  q.opts.forEach(function(opt) {
-    const div = document.createElement("div");
-    div.className = "option";
-    div.textContent = opt.t;
-    div.onclick = function() { choose(opt.k, div); };
-    box.appendChild(div);
-  });
-  
-  const quizArea = document.getElementById("quiz");
-  quizArea.style.animation = 'none';
-  quizArea.offsetHeight; 
-  quizArea.style.animation = 'fadeIn 0.4s ease';
-}
-
-function choose(k, el) {
-  if (isAnimating) return;
-  isAnimating = true;
-  el.classList.add("selected");
-  scores[k]++;
-  
-  setTimeout(() => {
-    current++;
-    if (current < questions.length) {
-      renderQuestion();
-      isAnimating = false;
-    } else {
-      showResult();
-      isAnimating = false;
-    }
-  }, 250); 
-}
-
-function showResult() {
-  let best = "A";
-  for (const k in scores) {
-    if (scores[k] > scores[best]) best = k;
-  }
-  currentResultKey = best; // 保存结果
-  const r = results[best];
-  
-  document.getElementById("rAvatar").textContent = r.avatar;
-  document.getElementById("rName").textContent = r.name;
-  document.getElementById("rLabel").textContent = r.label;
-  document.getElementById("rDesc").textContent = r.desc;
-  document.getElementById("rStrength").textContent = r.strength;
-  document.getElementById("rWeakness").textContent = r.weakness;
-  document.getElementById("rQuote").textContent = r.quote;
-
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("result").classList.remove("hidden");
-}
-
-// 核心功能：生成海报图片
-function generatePoster() {
-  const btn = document.getElementById("saveBtn");
-  btn.textContent = "生成中...";
-  
-  // 把当前结果填进隐藏的海报DOM里
-  const r = results[currentResultKey];
-  document.getElementById("p-avatar").textContent = r.avatar;
-  document.getElementById("p-name").textContent = r.name;
-  document.getElementById("p-label").textContent = r.label;
-  document.getElementById("p-quote").textContent = r.quote;
-
-  const posterDOM = document.getElementById("poster");
-
-  // 调用 html2canvas 渲染成图片
-  html2canvas(posterDOM, {
-    scale: 2, // 提升清晰度
-    useCORS: true,
-    backgroundColor: "#141210"
-  }).then(canvas => {
-    // 将 canvas 转为 base64 图片链接
-    const imgData = canvas.toDataURL("image/jpeg", 0.9);
-    
-    // 在手机上创建一个浮层让用户长按保存
-    const overlay = document.createElement("div");
-    overlay.style.position = "fixed";
-    overlay.style.top = "0"; overlay.style.left = "0";
-    overlay.style.width = "100%"; overlay.style.height = "100%";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.9)";
-    overlay.style.zIndex = "9999";
-    overlay.style.display = "flex";
-    overlay.style.flexDirection = "column";
-    overlay.style.alignItems = "center";
-    overlay.style.justifyContent = "center";
-    
-    const img = document.createElement("img");
-    img.src = imgData;
-    img.style.width = "80%";
-    img.style.maxWidth = "375px";
-    img.style.borderRadius = "12px";
-    
-    const tip = document.createElement("div");
-    tip.textContent = "长按图片保存到相册";
-    tip.style.color = "#d4af37";
-    tip.style.marginTop = "20px";
-    tip.style.fontSize = "16px";
-    tip.style.fontWeight = "bold";
-    
-    const closeBtn = document.createElement("div");
-    closeBtn.textContent = "✕";
-    closeBtn.style.position = "absolute";
-    closeBtn.style.top = "20px";
-    closeBtn.style.right = "20px";
-    closeBtn.style.color = "#fff";
-    closeBtn.style.fontSize = "30px";
-    closeBtn.onclick = () => document.body.removeChild(overlay);
-
-    overlay.appendChild(img);
-    overlay.appendChild(tip);
-    overlay.appendChild(closeBtn);
-    document.body.appendChild(overlay);
-    
-    btn.textContent = "生成图片";
-  }).catch(err => {
-    console.error("生成图片失败:", err);
-    alert("生成图片失败，请截图保存结果吧～");
-    btn.textContent = "生成图片";
-  });
-}
-
-function restart() {
-  document.getElementById("result").classList.add("hidden");
-  document.getElementById("cover").classList.remove("hidden");
-}
-</script>
-</body>
-</html>
+  document.getElementById("qTitle").
