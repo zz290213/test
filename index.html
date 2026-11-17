@@ -4,198 +4,223 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>测测你是哪本名著里的谁</title>
+<!-- 引入截图库 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
+  :root {
+    --bg-color: #141210;
+    --card-bg: #1e1b18;
+    --primary: #d4af37; /* 香槟金 */
+    --primary-light: #f3e5ab;
+    --text-main: #f0e6d2;
+    --text-sub: #9a8c76;
+    --border: #3d3226;
+  }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body {
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #1a1612; color: #e8dcc8; min-height: 100vh;
-    display: flex; justify-content: center; align-items: center; padding: 20px;
+    background: var(--bg-color); color: var(--text-main); min-height: 100vh;
+    display: flex; justify-content: center; align-items: center; padding: 16px;
   }
   .app {
-    width: 100%; max-width: 420px;
-    background: linear-gradient(160deg, #241e18 0%, #1a1612 100%);
-    border: 1px solid #3d3226; border-radius: 20px;
-    padding: 32px 24px; min-height: 520px;
+    width: 100%; max-width: 440px; background: var(--card-bg);
+    border: 1px solid var(--border); border-radius: 24px;
+    padding: 36px 24px; min-height: 580px;
     display: flex; flex-direction: column; justify-content: center;
-    position: relative; overflow: hidden;
+    position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   }
   .app::before {
-    content:""; position:absolute; top:-60px; right:-60px;
-    width:180px; height:180px;
-    background: radial-gradient(circle, rgba(200,169,110,0.15), transparent 70%);
-    border-radius:50%;
+    content:""; position:absolute; top:-80px; right:-80px;
+    width:220px; height:220px;
+    background: radial-gradient(circle, rgba(212,175,55,0.15), transparent 70%);
+    border-radius:50%; z-index: 0;
   }
   .hidden { display:none !important; }
+  
+  /* 首页 */
   .cover { text-align:center; position:relative; z-index:1; }
-  .cover .eyebrow { font-size:12px; letter-spacing:4px; color:#c8a96e; margin-bottom:18px; }
-  .cover h1 { font-size:28px; line-height:1.4; color:#f0e6d2; font-weight:600; margin-bottom:14px; }
-  .cover .sub { font-size:14px; color:#9a8c76; line-height:1.7; margin-bottom:36px; }
+  .cover .eyebrow { font-size:12px; letter-spacing:5px; color:var(--primary); margin-bottom:20px; font-weight: 600; }
+  .cover h1 { font-size:30px; line-height:1.4; color:var(--text-main); font-weight:700; margin-bottom:16px; letter-spacing: 1px; }
+  .cover .sub { font-size:14px; color:var(--text-sub); line-height:1.8; margin-bottom:40px; }
   .btn {
-    display:inline-block; width:100%; padding:15px; border:none; border-radius:12px;
-    background: linear-gradient(135deg, #c8a96e, #a8874e);
-    color:#1a1612; font-size:16px; font-weight:700; letter-spacing:1px;
-    cursor:pointer; transition:transform .15s, opacity .15s;
+    display:inline-block; width:100%; padding:16px; border:none; border-radius:14px;
+    background: linear-gradient(135deg, var(--primary), #b38e28);
+    color:#141210; font-size:17px; font-weight:800; letter-spacing:1px;
+    cursor:pointer; transition:transform .2s, box-shadow .2s;
+    box-shadow: 0 4px 15px rgba(212,175,55,0.3);
   }
-  .btn:active { transform:scale(.97); opacity:.9; }
-  .quiz { position:relative; z-index:1; }
-  .progress-wrap { margin-bottom:28px; }
-  .progress-text { font-size:12px; color:#9a8c76; margin-bottom:8px; text-align:right; }
-  .progress-bar { height:4px; background:#3d3226; border-radius:2px; overflow:hidden; }
-  .progress-fill { height:100%; width:16.6%; background:linear-gradient(90deg,#c8a96e,#e0c88e); border-radius:2px; transition:width .3s ease; }
-  .q-title { font-size:19px; line-height:1.6; color:#f0e6d2; margin-bottom:24px; font-weight:600; }
-  .options { display:flex; flex-direction:column; gap:12px; }
+  .btn:active { transform:scale(.97); box-shadow: 0 2px 8px rgba(212,175,55,0.3); }
+
+  /* 答题区 */
+  .quiz { position:relative; z-index:1; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .progress-wrap { margin-bottom:30px; }
+  .progress-text { font-size:12px; color:var(--primary); margin-bottom:10px; text-align:right; font-weight:600; letter-spacing: 1px;}
+  .progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .progress-fill { height:100%; width:10%; background:linear-gradient(90deg,var(--primary),var(--primary-light)); border-radius:3px; transition:width .3s ease; }
+  
+  .q-title { font-size:20px; line-height:1.6; color:var(--text-main); margin-bottom:28px; font-weight:600; }
+  .options { display:flex; flex-direction:column; gap:14px; }
   .option {
-    padding:16px 18px; border:1px solid #3d3226; border-radius:12px;
-    font-size:15px; line-height:1.6; color:#d8ccb8; cursor:pointer;
-    background:rgba(255,255,255,0.02); transition:all .18s;
+    padding:18px 20px; border:1.5px solid var(--border); border-radius:14px;
+    font-size:15px; line-height:1.5; color:#c4b7a3; cursor:pointer;
+    background:rgba(255,255,255,0.02); transition:all .2s;
   }
   .option:active, .option.selected {
-    border-color:#c8a96e; background:rgba(200,169,110,0.12); color:#f0e6d2;
+    border-color:var(--primary); background:rgba(212,175,55,0.1); color:var(--primary-light);
+    transform: scale(0.98);
   }
-  .result { text-align:center; position:relative; z-index:1; }
-  .result .tag { font-size:12px; letter-spacing:3px; color:#c8a96e; margin-bottom:16px; }
+
+  /* 结果区 */
+  .result { text-align:center; position:relative; z-index:1; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result .tag { font-size:12px; letter-spacing:4px; color:var(--primary); margin-bottom:20px; font-weight:600; }
   .result .avatar {
-    width:88px; height:88px; border-radius:50%; margin:0 auto 18px;
-    background:linear-gradient(135deg,#3d3226,#241e18);
-    border:2px solid #c8a96e; display:flex; align-items:center; justify-content:center;
-    font-size:32px; font-weight:700; color:#e0c88e;
+    width:100px; height:100px; border-radius:50%; margin:0 auto 20px;
+    background:linear-gradient(135deg,#2a241d,#141210);
+    border:2px solid var(--primary); display:flex; align-items:center; justify-content:center;
+    font-size:36px; font-weight:700; color:var(--primary-light);
+    box-shadow: 0 0 20px rgba(212,175,55,0.2);
   }
-  .result h2 { font-size:26px; color:#f0e6d2; margin-bottom:8px; }
-  .result .label { font-size:14px; color:#c8a96e; margin-bottom:22px; letter-spacing:1px; }
-  .result .desc {
-    font-size:15px; line-height:1.9; color:#b8ac98; text-align:left;
-    background:rgba(255,255,255,0.03); border-left:2px solid #c8a96e;
-    padding:18px 20px; border-radius:0 10px 10px 0; margin-bottom:26px;
+  .result h2 { font-size:28px; color:var(--primary-light); margin-bottom:8px; font-weight: 700; }
+  .result .label { font-size:14px; color:var(--primary); margin-bottom:24px; letter-spacing:1px; font-weight: 600;}
+  
+  .result-card {
+    background:rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 20px;
   }
-  .result .disclaimer { font-size:11px; color:#6b6050; line-height:1.6; margin-bottom:22px; }
+  .result-card h3 { font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: 600; }
+  .result-card p { font-size: 15px; line-height: 1.8; color: #b8ac98; margin-bottom: 16px; }
+  .result-card p:last-child { margin-bottom: 0; }
+  
+  .quote {
+    font-size: 14px; font-style: italic; color: var(--primary-light);
+    border-left: 3px solid var(--primary); padding-left: 12px; margin: 20px 0;
+    line-height: 1.6; text-align: left;
+  }
+
+  .result .disclaimer { font-size:11px; color:#6b6050; line-height:1.6; margin-bottom:24px; text-align: center;}
+  
+  .action-btns { display: flex; gap: 12px; margin-top: 10px; }
+  .btn-save {
+    flex: 1; background: linear-gradient(135deg, var(--primary), #b38e28); border: none; color: #141210;
+    font-size:15px; padding:15px; border-radius:14px; cursor:pointer; font-weight:700;
+    transition: all 0.2s; box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+  }
+  .btn-save:active { transform: scale(0.97); }
   .btn-again {
-    background:transparent; border:1px solid #c8a96e; color:#c8a96e;
-    font-size:15px; padding:14px; border-radius:12px; width:100%; cursor:pointer;
+    flex: 1; background:transparent; border:1.5px solid var(--border); color:var(--text-sub);
+    font-size:15px; padding:15px; border-radius:14px; cursor:pointer;
+    transition: all 0.2s; font-weight: 600;
+  }
+  .btn-again:active { background: rgba(255,255,255,0.05); color: var(--text-main); }
+
+  /* 隐藏的海报容器，用于生成图片 */
+  #poster-container {
+    position: absolute; top: -9999px; left: -9999px;
   }
 </style>
 </head>
 <body>
 <div class="app">
 
+  <!-- 首页 -->
   <div id="cover" class="cover">
     <div class="eyebrow">L I T E R A R Y · T E S T</div>
     <h1>测测你是<br>哪本名著里的谁</h1>
-    <p class="sub">6 道题，看看你骨子里住着<br>哪个文学人物的灵魂</p>
-    <button class="btn" onclick="startQuiz()">开始测试</button>
+    <p class="sub">10 道直击灵魂的选择题<br>看看你骨子里住着哪位文学巨匠的灵魂</p>
+    <button class="btn" onclick="startQuiz()">开启灵魂测试</button>
   </div>
 
+  <!-- 答题 -->
   <div id="quiz" class="quiz hidden">
     <div class="progress-wrap">
-      <div class="progress-text" id="progressText">1 / 6</div>
+      <div class="progress-text" id="progressText">1 / 10</div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
     <div class="q-title" id="qTitle"></div>
     <div class="options" id="options"></div>
   </div>
 
+  <!-- 结果 -->
   <div id="result" class="result hidden">
     <div class="tag">YOUR ARCHETYPE</div>
     <div class="avatar" id="rAvatar"></div>
     <h2 id="rName"></h2>
     <div class="label" id="rLabel"></div>
-    <div class="desc" id="rDesc"></div>
-    <p class="disclaimer">本测试仅供娱乐，不具备任何专业诊断效力。</p>
-    <button class="btn-again" onclick="restart()">再测一次</button>
+    
+    <div class="result-card">
+      <h3>灵魂画像</h3>
+      <p id="rDesc"></p>
+      <h3>你的高光</h3>
+      <p id="rStrength"></p>
+      <h3>潜在盲区</h3>
+      <p id="rWeakness"></p>
+    </div>
+    
+    <div class="quote" id="rQuote"></div>
+    
+    <p class="disclaimer">* 本测试基于文学原型理论生成，仅供娱乐。</p>
+    
+    <div class="action-btns">
+      <button class="btn-save" id="saveBtn" onclick="generatePoster()">生成图片</button>
+      <button class="btn-again" onclick="restart()">再测一次</button>
+    </div>
   </div>
 
 </div>
 
+<!-- 隐藏的海报模板 (生成图片专用) -->
+<div id="poster-container">
+  <div id="poster" style="width: 375px; padding: 40px 30px; background: linear-gradient(160deg, #1e1b18, #141210); border-radius: 20px; box-sizing: border-box; position: relative;">
+    <div style="text-align: center; color: #d4af37; font-size: 12px; letter-spacing: 3px; margin-bottom: 20px; font-weight: bold;">LITERARY TEST</div>
+    <div id="p-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: #2a241d; border: 2px solid #d4af37; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: #f3e5ab; font-size: 28px; font-weight: bold;"></div>
+    <div id="p-name" style="text-align: center; color: #f3e5ab; font-size: 24px; font-weight: bold; margin-bottom: 5px;"></div>
+    <div id="p-label" style="text-align: center; color: #d4af37; font-size: 13px; margin-bottom: 25px;"></div>
+    <div id="p-quote" style="font-size: 14px; color: #f0e6d2; font-style: italic; text-align: center; line-height: 1.6; margin-bottom: 25px; padding: 0 10px; border-left: 2px solid #d4af37; border-right: 2px solid #d4af37; padding-top: 8px; padding-bottom: 8px;"></div>
+    <div style="border-top: 1px dashed #3d3226; margin-bottom: 20px;"></div>
+    <div style="text-align: center; font-size: 12px; color: #9a8c76; margin-bottom: 25px;">
+      <p style="margin-bottom: 5px;">长按识别二维码，测测你的隐藏灵魂</p>
+      <!-- 这里用一个方块占位，后续你可以换成自己的公众号/小红书二维码 -->
+      <div style="width: 60px; height: 60px; background: #333; margin: 0 auto; border-radius: 4px; color: #666; font-size: 10px; line-height: 60px;">二维码</div>
+    </div>
+    <div style="text-align: center; font-size: 10px; color: #555; letter-spacing: 1px;">* 本测试仅供娱乐</div>
+  </div>
+</div>
+
 <script>
 const questions = [
-  {
-    q: "朋友深夜找你倾诉糟心事，你的第一反应是？",
-    opts: [
-      { t: "陪她一起难过，说着说着自己也想哭了", k: "A" },
-      { t: "先听她说完，然后帮她理清楚下一步该怎么做", k: "B" },
-      { t: "“谁欺负你了？我现在就去找他算账”", k: "C" },
-      { t: "安静听完，问一句：“你觉得最让你难受的点是什么？”", k: "D" }
-    ]
-  },
-  {
-    q: "你走进一个全是陌生人的聚会，通常会？",
-    opts: [
-      { t: "找个角落坐下，默默观察谁看起来比较面善", k: "A" },
-      { t: "主动找一两个人聊，话题合适就继续，不合适就撤", k: "B" },
-      { t: "直接加入最热闹的那一堆，先玩起来再说", k: "C" },
-      { t: "站在旁边听，脑子里在分析这群人的关系网", k: "D" }
-    ]
-  },
-  {
-    q: "遇到一个你很想做但所有人都说“不靠谱”的事，你会？",
-    opts: [
-      { t: "纠结很久，最后还是放弃了，但心里一直惦记", k: "A" },
-      { t: "自己偷偷准备，等有把握了再拿出来", k: "B" },
-      { t: "“不试试怎么知道不行？” 先干了再说", k: "C" },
-      { t: "花一个晚上把风险和收益列清楚，再决定", k: "D" }
-    ]
-  },
-  {
-    q: "你最受不了身边的人哪种行为？",
-    opts: [
-      { t: "冷漠，对别人的情绪完全不在意", k: "A" },
-      { t: "虚伪，当面一套背后一套", k: "B" },
-      { t: "磨叽，明明能动手的事非要开会讨论", k: "C" },
-      { t: "蠢，同样的问题反复犯还不自知", k: "D" }
-    ]
-  },
-  {
-    q: "如果明天不用上班/上学，你最想怎么过？",
-    opts: [
-      { t: "窝在家里，拉上窗帘看一部老电影或小说", k: "A" },
-      { t: "约一两个真正聊得来的朋友，找个安静地方坐坐", k: "B" },
-      { t: "临时起意去个没去过的地方，越随性越好", k: "C" },
-      { t: "把积压的事情整理清楚，顺便研究点自己感兴趣的东西", k: "D" }
-    ]
-  },
-  {
-    q: "别人对你的评价里，哪一句你最愿意认领？",
-    opts: [
-      { t: "“你很懂人，也很容易受伤”", k: "A" },
-      { t: "“你看起来好说话，但其实很有原则”", k: "B" },
-      { t: "“你这个人，活得很带劲”", k: "C" },
-      { t: "“你想得比一般人多，也比一般人冷静”", k: "D" }
-    ]
-  }
+  { q: "朋友深夜找你倾诉糟心事，你的第一反应是？", opts: [{ t: "陪她一起难过，说着说着自己也想哭了", k: "A" }, { t: "先听她说完，然后帮她理清楚下一步该怎么做", k: "B" }, { t: "“谁欺负你了？我现在就去找他算账”", k: "C" }, { t: "安静听完，问一句：“你觉得最让你难受的点是什么？”", k: "D" }, { t: "先问清楚来龙去脉，脑子里已经在盘算这件事怎么处理最有利", k: "E" }, { t: "跟她讲一个更离谱的故事，试图让她觉得人生本来就荒诞", k: "F" }] },
+  { q: "你走进一个全是陌生人的聚会，通常会？", opts: [{ t: "找个角落坐下，默默观察谁看起来比较面善", k: "A" }, { t: "主动找一两个人聊，话题合适就继续，不合适就撤", k: "B" }, { t: "直接加入最热闹的那一堆，先玩起来再说", k: "C" }, { t: "站在旁边听，脑子里在分析这群人的关系网", k: "D" }, { t: "先判断这场合里谁说话最有分量，然后找机会认识他", k: "E" }, { t: "跟谁都能聊两句，聊着聊着就开始讲自己最近痴迷的事", k: "F" }] },
+  { q: "遇到一个你很想做但所有人都说“不靠谱”的事，你会？", opts: [{ t: "纠结很久，最后还是放弃了，但心里一直惦记", k: "A" }, { t: "自己偷偷准备，等有把握了再拿出来", k: "B" }, { t: "“不试试怎么知道不行？” 先干了再说", k: "C" }, { t: "花一个晚上把风险和收益列清楚，再决定", k: "D" }, { t: "先评估这件事能不能帮我积累资源或话语权，能就干", k: "E" }, { t: "根本不需要别人认可，我想做就去做，哪怕看起来傻", k: "F" }] },
+  { q: "你最受不了身边的人哪种行为？", opts: [{ t: "冷漠，对别人的情绪完全不在意", k: "A" }, { t: "虚伪，当面一套背后一套", k: "B" }, { t: "磨叽，明明能动手的事非要开会讨论", k: "C" }, { t: "蠢，同样的问题反复犯还不自知", k: "D" }, { t: "没野心，明明有机会往上走却自己先退缩", k: "E" }, { t: "太现实，张口闭口都是钱和利益，一点浪漫都没有", k: "F" }] },
+  { q: "如果明天不用上班/上学，你最想怎么过？", opts: [{ t: "窝在家里，拉上窗帘看一部老电影或小说", k: "A" }, { t: "约一两个真正聊得来的朋友，找个安静地方坐坐", k: "B" }, { t: "临时起意去个没去过的地方，越随性越好", k: "C" }, { t: "把积压的事情整理清楚，顺便研究点自己感兴趣的东西", k: "D" }, { t: "约几个有用的人吃饭，顺便把下周要推进的事聊一聊", k: "E" }, { t: "去做一件别人觉得很“没用”但我一直想做的事", k: "F" }] },
+  { q: "别人对你的评价里，哪一句你最愿意认领？", opts: [{ t: "“你很懂人，也很容易受伤”", k: "A" }, { t: "“你看起来好说话，但其实很有原则”", k: "B" }, { t: "“你这个人，活得很带劲”", k: "C" }, { t: "“你想得比一般人多，也比一般人冷静”", k: "D" }, { t: "“你很清楚自己要什么，而且拿得到”", k: "E" }, { t: "“你活在自己的世界里，但那个世界挺有意思”", k: "F" }] },
+  { q: "当团队里出现分歧，大家吵得不可开交时，你通常会？", opts: [{ t: "先不说话，等大家情绪过去，再私下找关键的人聊", k: "A" }, { t: "把各方观点列出来，找一个大家都能接受的折中方案", k: "B" }, { t: "直接拍板：“别吵了，先按这个干，不行再改”", k: "C" }, { t: "安静听完所有人的逻辑漏洞，最后一次性指出来", k: "D" }, { t: "看谁的意见最后会赢，提前站到那一边并帮忙推进", k: "E" }, { t: "提出一个大家都没想到的第三种可能，哪怕听起来不现实", k: "F" }] },
+  { q: "你更相信哪一种力量？", opts: [{ t: "共情。能感受到别人的感受，关系才不会断", k: "A" }, { t: "原则。守住底线，别人才会真正尊重你", k: "B" }, { t: "行动。想再多不如先干一票", k: "C" }, { t: "理性。情绪会骗人，逻辑不会", k: "D" }, { t: "掌控。谁掌握资源和规则，谁说了算", k: "E" }, { t: "信念。别人觉得可笑的东西，我信它就值得", k: "F" }] },
+  { q: "如果让你选一个词形容自己，你会选？", opts: [{ t: "细腻", k: "A" }, { t: "清醒", k: "B" }, { t: "痛快", k: "C" }, { t: "冷静", k: "D" }, { t: "野心", k: "E" }, { t: "痴迷", k: "F" }] },
+  { q: "多年以后，你希望别人怎么记住你？", opts: [{ t: "一个真正懂人、让人感到被看见的人", k: "A" }, { t: "一个不依附谁、始终守住自己的人", k: "B" }, { t: "一个敢打敢冲、活得尽兴的人", k: "C" }, { t: "一个看得最透、判断最准的人", k: "D" }, { t: "一个把局面做大、真正改变规则的人", k: "E" }, { t: "一个敢为别人觉得荒唐的事认真一辈子的人", k: "F" }] }
 ];
 
 const results = {
-  A: {
-    name: "林黛玉",
-    label: "敏感细腻型 · 红楼一梦",
-    avatar: "黛",
-    desc: "你是那种把感受放在第一位的人。别人眼里的小事，在你心里会泛起很久的涟漪。敏感不是缺点，它让你比别人更早察觉到空气里的不对劲，也让你更懂温柔是什么。只是别让内耗把你困住。"
-  },
-  B: {
-    name: "简·爱",
-    label: "清醒独立型 · 灵魂平等",
-    avatar: "简",
-    desc: "你看起来温和，骨子里却有很硬的底线。你可以妥协，但不会为了讨好谁而丢掉自己。你相信平等的关系，也愿意为值得的人付出，前提是对方尊重你的独立。"
-  },
-  C: {
-    name: "孙悟空",
-    label: "不服就干型 · 齐天大圣",
-    avatar: "悟",
-    desc: "你受不了磨叽和弯弯绕绕。看到问题就想解决，看到不公就想站出来。你的能量很高，但也容易因为太直接而碰壁。有时候慢一点、绕一步，你的战斗力反而能用在更关键的地方。"
-  },
-  D: {
-    name: "福尔摩斯",
-    label: "冷静观察型 · 推理至上",
-    avatar: "福",
-    desc: "你习惯先观察再行动。人群里你话不多，但脑子里一直在转。你不太容易被情绪带着走，更相信逻辑和证据。这让你在做判断时比别人稳，但也可能让人觉得你有点远。"
-  }
+  A: { name: "林黛玉", label: "敏感细腻型 · 红楼一梦", avatar: "黛", desc: "你是那种把感受放在第一位的人。别人眼里的小事，在你心里会泛起很久的涟漪。你有着极高的情感分辨率。", strength: "极高的共情力与艺术直觉。你懂人性的幽微，能给人提供深度的情绪价值。", weakness: "容易陷入精神内耗，过度咀嚼负面情绪。有时候，钝感力是你需要学习的课题。", quote: "“我就是个多愁多病身，你就是那倾国倾城貌。”" },
+  B: { name: "简·爱", label: "清醒独立型 · 灵魂平等", avatar: "简", desc: "你看起来温和，骨子里却有很硬的底线。你可以妥协，但不会为了讨好谁而丢掉自己。你相信平等的灵魂。", strength: "强大的内核与自尊。无论身处何种逆境，你都有重新站起来的底气。", weakness: "有时过于倔强，可能会把真正关心你的人推远。适度的柔软并非软弱。", quote: "“你以为我穷、低微、不美，就没有灵魂没有心吗？”" },
+  C: { name: "孙悟空", label: "不服就干型 · 齐天大圣", avatar: "悟", desc: "你受不了磨叽和弯弯绕绕。看到问题就想解决，看到不公就想站出来。你崇尚自由，有着极强的行动力。", strength: "敢想敢做，永远充满生命力。在困境中，你往往是最先找到出路的那个人。", weakness: "容易因为太直接而碰壁，缺乏耐心。有时候慢一点、绕一步，战力反而更强。", quote: "“皇帝轮流做，明年到我家。”" },
+  D: { name: "福尔摩斯", label: "冷静观察型 · 推理至上", avatar: "福", desc: "你习惯先观察再行动。人群里你话不多，但脑子里一直在转。你不太容易被情绪带着走，更相信逻辑和证据。", strength: "极强的理性思维与专注力。在混乱中，你总能一眼看穿事物的本质。", weakness: "可能显得缺乏人情味，让人觉得有距离感。并非所有问题都能用逻辑解决。", quote: "“排除一切不可能，剩下的即使再不可思议，那也是真相。”" },
+  E: { name: "曹操", label: "掌控野心型 · 乱世枭雄", avatar: "曹", desc: "你天生对“局面”敏感。别人看到的是人和事，你看到的是资源和位置。你不喜欢被安排，更愿意自己定规则。", strength: "卓越的统筹力与决断力。你能团结各方力量，去达成一个宏大的目标。", weakness: "掌控欲过强容易让身边人感到压抑。偶尔放下目的，去享受无用的快乐。", quote: "“宁教我负天下人，休教天下人负我。”" },
+  F: { name: "堂吉诃德", label: "理想主义型 · 痴心骑士", avatar: "堂", desc: "你心里有一套自己的世界，而且不太愿意为了现实把它改小。别人觉得你痴、你傻，但你知道自己在认真对待什么。", strength: "永不熄灭的信念感与热情。即使所有人都不看好，你依然敢于为了热爱冲锋。", weakness: "容易脱离现实，活在自己的滤镜里。理想很丰满，但也需要给自己留点退路。", quote: "“我知道我是谁，我知道我想成为谁。”" }
 };
 
 let current = 0;
-let scores = { A:0, B:0, C:0, D:0 };
+let scores = { A:0, B:0, C:0, D:0, E:0, F:0 };
+let isAnimating = false;
+let currentResultKey = "A"; // 记录当前结果
 
 function startQuiz() {
   current = 0;
-  scores = { A:0, B:0, C:0, D:0 };
+  scores = { A:0, B:0, C:0, D:0, E:0, F:0 };
   document.getElementById("cover").classList.add("hidden");
   document.getElementById("result").classList.add("hidden");
   document.getElementById("quiz").classList.remove("hidden");
@@ -214,19 +239,32 @@ function renderQuestion() {
     const div = document.createElement("div");
     div.className = "option";
     div.textContent = opt.t;
-    div.onclick = function() { choose(opt.k); };
+    div.onclick = function() { choose(opt.k, div); };
     box.appendChild(div);
   });
+  
+  const quizArea = document.getElementById("quiz");
+  quizArea.style.animation = 'none';
+  quizArea.offsetHeight; 
+  quizArea.style.animation = 'fadeIn 0.4s ease';
 }
 
-function choose(k) {
+function choose(k, el) {
+  if (isAnimating) return;
+  isAnimating = true;
+  el.classList.add("selected");
   scores[k]++;
-  current++;
-  if (current < questions.length) {
-    renderQuestion();
-  } else {
-    showResult();
-  }
+  
+  setTimeout(() => {
+    current++;
+    if (current < questions.length) {
+      renderQuestion();
+      isAnimating = false;
+    } else {
+      showResult();
+      isAnimating = false;
+    }
+  }, 250); 
 }
 
 function showResult() {
@@ -234,14 +272,89 @@ function showResult() {
   for (const k in scores) {
     if (scores[k] > scores[best]) best = k;
   }
+  currentResultKey = best; // 保存结果
   const r = results[best];
+  
   document.getElementById("rAvatar").textContent = r.avatar;
   document.getElementById("rName").textContent = r.name;
   document.getElementById("rLabel").textContent = r.label;
   document.getElementById("rDesc").textContent = r.desc;
+  document.getElementById("rStrength").textContent = r.strength;
+  document.getElementById("rWeakness").textContent = r.weakness;
+  document.getElementById("rQuote").textContent = r.quote;
 
   document.getElementById("quiz").classList.add("hidden");
   document.getElementById("result").classList.remove("hidden");
+}
+
+// 核心功能：生成海报图片
+function generatePoster() {
+  const btn = document.getElementById("saveBtn");
+  btn.textContent = "生成中...";
+  
+  // 把当前结果填进隐藏的海报DOM里
+  const r = results[currentResultKey];
+  document.getElementById("p-avatar").textContent = r.avatar;
+  document.getElementById("p-name").textContent = r.name;
+  document.getElementById("p-label").textContent = r.label;
+  document.getElementById("p-quote").textContent = r.quote;
+
+  const posterDOM = document.getElementById("poster");
+
+  // 调用 html2canvas 渲染成图片
+  html2canvas(posterDOM, {
+    scale: 2, // 提升清晰度
+    useCORS: true,
+    backgroundColor: "#141210"
+  }).then(canvas => {
+    // 将 canvas 转为 base64 图片链接
+    const imgData = canvas.toDataURL("image/jpeg", 0.9);
+    
+    // 在手机上创建一个浮层让用户长按保存
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0"; overlay.style.left = "0";
+    overlay.style.width = "100%"; overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.9)";
+    overlay.style.zIndex = "9999";
+    overlay.style.display = "flex";
+    overlay.style.flexDirection = "column";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    
+    const img = document.createElement("img");
+    img.src = imgData;
+    img.style.width = "80%";
+    img.style.maxWidth = "375px";
+    img.style.borderRadius = "12px";
+    
+    const tip = document.createElement("div");
+    tip.textContent = "长按图片保存到相册";
+    tip.style.color = "#d4af37";
+    tip.style.marginTop = "20px";
+    tip.style.fontSize = "16px";
+    tip.style.fontWeight = "bold";
+    
+    const closeBtn = document.createElement("div");
+    closeBtn.textContent = "✕";
+    closeBtn.style.position = "absolute";
+    closeBtn.style.top = "20px";
+    closeBtn.style.right = "20px";
+    closeBtn.style.color = "#fff";
+    closeBtn.style.fontSize = "30px";
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+
+    overlay.appendChild(img);
+    overlay.appendChild(tip);
+    overlay.appendChild(closeBtn);
+    document.body.appendChild(overlay);
+    
+    btn.textContent = "生成图片";
+  }).catch(err => {
+    console.error("生成图片失败:", err);
+    alert("生成图片失败，请截图保存结果吧～");
+    btn.textContent = "生成图片";
+  });
 }
 
 function restart() {
